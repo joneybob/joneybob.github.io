@@ -300,7 +300,7 @@ footer{padding:28px 0;font:400 12px var(--mono);color:var(--muted)}
     <div class="hero-grid">
       <div>
         <h1>Jonathan<br><em>Schwartz</em></h1>
-        <p class="lede">I build election models, data pipelines and the apps I wish existed. Right now I'm a <strong>Product/Data Science Fellow at VoteHub</strong>, turning election data into articles and tools people use.</p>
+        <p class="lede">I take a messy pile of information, work out what matters and make a call under uncertainty. Right now that means election data as a <strong>Data Science &amp; Project Fellow at VoteHub</strong>, energy markets at Penn, and apps I build to fix my own problems.</p>
       </div>
       <nav class="index" aria-label="Projects">
         <div class="eyebrow">Index</div>
@@ -330,8 +330,8 @@ footer{padding:28px 0;font:400 12px var(--mono);color:var(--muted)}
       <div>
         <h3>Bellwether</h3>
         <p class="role">Election atlas &amp; forecast · Solo · 2026</p>
-        <p>An atlas of every certified election return in American history, down to the county and precinct. Anyone can pull up past results, compare places and simulate their own outcome. I built the pipeline, the model and the interface myself.</p>
-        <p>I collected every result from state and county sources, cleaned it, joined it to Census and polling data, and shipped it as one web app with a full methodology paper behind it.</p>
+        <p>An atlas of every certified election return in American history, down to the county and precinct. Anyone can pull up past results, compare places and simulate their own outcome. I designed and built it over the summer alongside my job.</p>
+        <p>Every result comes from state and county sources, cleaned and joined to Census and polling data. The forecast runs a 20,000-draw Monte Carlo simulation, with regression and survey-weighting models fit on 532,000 survey respondents, and a full methodology paper explains every step.</p>
         <div class="tags"><span>Python</span><span>JavaScript</span><span>GeoJSON</span><span>Census data</span></div>
         <div class="links"><a href="https://bellwetherelections.com" target="_blank" rel="noopener">bellwetherelections.com ↗</a></div>
       </div>
@@ -339,7 +339,7 @@ footer{padding:28px 0;font:400 12px var(--mono);color:var(--muted)}
         <dl>
           <dt>16.6 billion</dt><dd>votes counted, every certified return since 1788</dd>
           <dt>3,144</dt><dd>counties, plus 167,775+ precincts</dd>
-          <dt>10</dt><dd>workspaces, from the county map to redistricting and the Supreme Court</dd>
+          <dt>20,000</dt><dd>Monte Carlo draws behind each forecast</dd>
         </dl>
       </div>
       <div class="browser" id="bw-live">
@@ -360,8 +360,8 @@ footer{padding:28px 0;font:400 12px var(--mono);color:var(--muted)}
       <div class="num">02<i>/05</i></div>
       <div>
         <h3>VoteHub</h3>
-        <p class="role">Product/Data Science Fellow · 2026</p>
-        <p>VoteHub is an election data and media startup. I write its data features, build the data sets behind them and build tools for election night.</p>
+        <p class="role">Data Science &amp; Project Fellow · Remote · 2026–now</p>
+        <p>VoteHub is a nonpartisan political data science startup that forecasts and calls elections. I help with data collection, election calling and product design, and I write data features for the site.</p>
         <p>First, I built a national data set covering every precinct on the 2020 map. Next, I used it for articles on data centers, AI political ads, Trump's approval and the campus vote. Lastly, I built a race-calling console for election night.</p>
         <div class="tags"><span>Python</span><span>Datawrapper</span><span>JavaScript</span></div>
         <div class="links"><a href="https://votehub.com/2026-campaign-tracker/" target="_blank" rel="noopener">2026 Campaign Tracker ↗</a></div>
@@ -412,7 +412,7 @@ footer{padding:28px 0;font:400 12px var(--mono);color:var(--muted)}
         <h3>Focs</h3>
         <p class="role">Focus app for iPhone &amp; Mac · Solo · 2025–now</p>
         <p>I wanted one app that blocks distractions, knows my class schedule and shows whether I'm actually getting work done. Nothing did all three, so I built it.</p>
-        <p>Focs runs Pomodoro and Flowtime sessions, blocks apps through Screen Time and plans each day around your classes. It syncs to a Mac app with end-to-end encryption, and friends can see each other's focus time.</p>
+        <p>Paste a messy list from Notes and a parser turns it into tasks. A schedule-aware planner fits the work between your classes and learns how long tasks really take. Start a session on the Mac and it shows up as a Live Activity on your iPhone, over end-to-end encrypted sync. It has 220+ unit tests.</p>
         <div class="tags"><span>Swift</span><span>SwiftUI</span><span>CloudKit</span><span>Screen Time API</span><span>WidgetKit</span></div>
       </div>
       <figure class="device">
@@ -453,11 +453,11 @@ footer{padding:28px 0;font:400 12px var(--mono);color:var(--muted)}
       <div class="num">05<i>/05</i></div>
       <div>
         <h3>St. Elmo Late Night</h3>
-        <p class="role">Web app for Delta Phi · 2026</p>
+        <p class="role">Web app for the St. Elmo Club (Delta Phi) · Fall 2026–now</p>
         <p>Running a late night at the house used to take a group chat, a spreadsheet and a lot of yelling. Now one app handles all of it.</p>
-        <p>Brothers sign up for roles, add their guests and see who is up next. The door gets a searchable guest list, the social team gets checklists and a record of no-shows, and the whole thing installs on a phone like a native app.</p>
+        <p>Brothers sign up for roles, add up to five guests each and see who is up next. The door gets a searchable guest list, the social team gets checklists and a record of no-shows, and the whole thing installs on a phone like a native app. I kept changing it as brothers used it: individual logins replaced a shared house code, and I cut steps that added friction without helping.</p>
         <p class="aside">The demo runs the same code the house uses, with the database swapped for an in-memory one. Every name is invented.</p>
-        <div class="tags"><span>JavaScript</span><span>Firebase</span><span>PWA</span></div>
+        <div class="tags"><span>JavaScript</span><span>Firebase</span><span>Vercel</span><span>PWA</span></div>
         <div class="links"><a href="latenight/" target="_blank" rel="noopener">Open full screen ↗</a></div>
       </div>
       <figure class="device device-live">
@@ -472,18 +472,20 @@ footer{padding:28px 0;font:400 12px var(--mono);color:var(--muted)}
   <div class="wrap about">
     <div class="reveal">
       <h2 style="margin-bottom:28px">About</h2>
-      <p>During high school, I spent a summer at Berkeley Lab analyzing battery storage and grid emissions. I learned R, worked with very large data sets and got one piece of advice I still use: find the intersection between your talents and your passions.</p>
-      <p>For me, that intersection is data and politics. I study Mathematical Economics at Penn, with minors in Statistics &amp; Data Science and Political Science, and I build tools that make elections easier to understand.</p>
-      <p>I'm from Berkeley, California, where I rowed on the Oakland Estuary and co-founded a crew to clean it up.</p>
+      <p>Early in high school, the blackouts in California got me reading about CAISO and how my home state makes and uses its power. In summer 2023, I worked with six staff scientists at Lawrence Berkeley National Laboratory on models of home solar and battery storage, comparing charge and discharge strategies against power prices. One of my mentors there told me that a job is about finding the intersection between the passions you have and the skills you have learned. For me, that is energy, elections and data.</p>
+      <p>This summer at Penn's PORES program, another team was collecting transcripts of 60,000 political ads by hand, one link at a time. That seemed like the least efficient way to do it, so I wrote a Python script that collected the remaining 40,000 in 48 hours. I also helped design questions for a survey that ran on the front page of The New York Times, and on election night I worked the NBC News Decision Desk for the Michigan Senate primary.</p>
+      <p>I'm from Berkeley, California. At Penn I'm a policy analyst with the Wharton Undergraduate Energy Group, social chair of the St. Elmo Club and a satire writer for Under the Button. Off the clock: surfing, long-take cinematography, NYT Cooking and Wikipedia rabbit holes.</p>
     </div>
     <div class="facts reveal">
       <div><span>School</span>University of Pennsylvania, Class of 2028</div>
       <div><span>Major</span>Mathematical Economics</div>
       <div><span>Minors</span>Statistics &amp; Data Science · Political Science</div>
-      <div><span>Now</span>Product/Data Science Fellow, VoteHub</div>
-      <div><span>Summer '26</span>PORES Fellow, judicial election advertising data</div>
-      <div><span>Before</span>Berkeley Lab · COSMOS · Berkeley High School</div>
-      <div><span>Tools</span>Python · R · Swift · JavaScript</div>
+      <div><span>Now</span>Data Science &amp; Project Fellow, VoteHub · Policy Analyst, Wharton Undergraduate Energy Group</div>
+      <div><span>Summer '26</span>Data Science Research Fellow, PORES, University of Pennsylvania</div>
+      <div><span>Summer '25</span>Clinician, Lindamood-Bell: taught literacy full time to students ages 8–18</div>
+      <div><span>Summer '23</span>Research Intern, Lawrence Berkeley National Lab, funded by an EIR grant</div>
+      <div><span>Skills</span>Python · R · SwiftUI · Excel · PowerPoint · AI tools (Claude Code)</div>
+      <div><span>Languages</span>English · Spanish (professional) · Italian (elementary)</div>
     </div>
   </div>
 </section>
@@ -494,6 +496,7 @@ footer{padding:28px 0;font:400 12px var(--mono);color:var(--muted)}
     <h2 style="margin-top:18px">Send me a problem worth solving.</h2>
     <div class="links">
       <a href="mailto:jonats@sas.upenn.edu">jonats@sas.upenn.edu</a>
+      <a href="https://www.linkedin.com/in/jonathan-r-s" target="_blank" rel="noopener">LinkedIn ↗</a>
       <a href="https://github.com/joneybob" target="_blank" rel="noopener">GitHub ↗</a>
     </div>
   </div>
