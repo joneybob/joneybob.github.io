@@ -227,6 +227,26 @@ footer{padding:28px 0;font:400 12px var(--mono);color:var(--muted)}
 .device-live{width:min(330px,100%)}
 .device-live .screen{position:relative;overflow:hidden;border:8px solid var(--ink);border-radius:36px;background:#0B0D10;box-shadow:0 30px 60px -30px rgba(0,0,0,.35);height:640px}
 .device-live iframe{position:absolute;top:0;left:0;width:430px;height:900px;border:0;transform-origin:0 0}
+
+/* galleries */
+.gallery{grid-column:2 / -1;display:grid;grid-auto-flow:column;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:10px;scrollbar-width:thin}
+.gallery.wide{grid-auto-columns:min(460px,82%)}
+.gallery.tall{grid-auto-columns:min(200px,46%)}
+.gallery figure{margin:0;scroll-snap-align:start}
+.gallery .shot{display:block;padding:0;border:1px solid var(--rule);border-radius:12px;overflow:hidden;background:var(--card);cursor:zoom-in;width:100%;transition:transform .2s,border-color .2s}
+.gallery .shot:hover{transform:translateY(-2px);border-color:var(--ink)}
+.gallery.tall .shot{border-radius:22px}
+.gallery img{display:block;width:100%;height:auto}
+.gallery figcaption{font:400 12px/1.45 var(--mono);color:var(--muted);margin-top:8px}
+.gal-note{grid-column:2 / -1;margin:0;font-size:14px;color:var(--muted)}
+.gal-note a{color:var(--ink)}
+@media (max-width:860px){.gallery,.gal-note{grid-column:auto}}
+#lb{border:0;padding:0;background:transparent;max-width:min(1200px,94vw);max-height:92vh}
+#lb::backdrop{background:rgba(0,0,0,.82)}
+#lb img{display:block;max-width:min(1200px,94vw);max-height:84vh;width:auto;height:auto;margin:0 auto;border-radius:10px}
+#lb p{color:#eee;font:400 13px var(--mono);text-align:center;margin:12px 0 0}
+#lb .x{position:fixed;top:14px;right:18px;background:none;border:0;color:#fff;font-size:30px;cursor:pointer}
+
 /* motion */
 .reveal{opacity:0;transform:translateY(14px);transition:opacity .7s ease,transform .7s ease}
 .reveal.in{opacity:1;transform:none}
@@ -284,23 +304,15 @@ footer{padding:28px 0;font:400 12px var(--mono);color:var(--muted)}
         </dl>
       </div>
       <div class="browser" id="bw-live">
-        <div class="bar"><i></i><i></i><i></i><span>bellwetherelections.com</span><button class="bw-launch solid" type="button">Try it live</button><a class="bw-open" href="https://bellwetherelections.com" target="_blank" rel="noopener">Open ↗</a></div>
+        <div class="bar"><i></i><i></i><i></i><span>bellwetherelections.com</span><button class="bw-launch solid" type="button">Load live site</button><a class="bw-open" href="https://bellwetherelections.com" target="_blank" rel="noopener">Open ↗</a></div>
         <video src="media/bellwether.mp4" poster="media/bellwether.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Recording of Bellwether: county results for 2024, the 2020 to 2024 swing, then 2008 and 1960"></video>
       </div>
-      <div class="demo" id="demo-bellwether">
-        <div class="demo-head"><span class="try">Try it</span><span>Swing the country, or click a state to flip it</span></div>
-        <div class="bw-score">
-          <div class="bw-nums"><span><b class="bw-d">0</b> Dem</span><strong class="bw-verdict"></strong><span>Rep <b class="bw-r">0</b></span></div>
-          <div class="bw-bar"><i class="bw-bar-d"></i><i class="bw-bar-r"></i><em></em></div>
-        </div>
-        <div class="bw-grid"></div>
-        <div class="bw-controls">
-          <label>Uniform swing <span class="bw-swing-val"></span></label>
-          <input class="bw-swing" type="range" min="-10" max="10" step="0.5" value="0" aria-label="National swing">
-          <div class="bw-scale"><span>R +10</span><span>2024</span><span>D +10</span></div>
-          <button class="ghost bw-reset">Reset</button>
-        </div>
-        <p class="demo-note">Approximate 2024 presidential margins. Maine and Nebraska districts are folded into their states. The full Bellwether app works county by county.</p>
+      <div class="gallery wide">
+          <figure><button class="shot" type="button"><img src="media/shots/bw-1.jpg" alt="Explore: every county, 2024 presidential" loading="lazy"></button><figcaption>Explore: every county, 2024 presidential</figcaption></figure>
+          <figure><button class="shot" type="button"><img src="media/shots/bw-2.jpg" alt="Simulate: shift turnout and group support" loading="lazy"></button><figcaption>Simulate: shift turnout and group support</figcaption></figure>
+          <figure><button class="shot" type="button"><img src="media/shots/bw-3.jpg" alt="Forecast: 2026 Senate odds of control" loading="lazy"></button><figcaption>Forecast: 2026 Senate odds of control</figcaption></figure>
+          <figure><button class="shot" type="button"><img src="media/shots/bw-4.jpg" alt="Analysis: turnout and margins over time" loading="lazy"></button><figcaption>Analysis: turnout and margins over time</figcaption></figure>
+          <figure><button class="shot" type="button"><img src="media/shots/bw-5.jpg" alt="Voters: North Carolina county scores" loading="lazy"></button><figcaption>Voters: North Carolina county scores</figcaption></figure>
       </div>
     </article>
 
@@ -312,6 +324,7 @@ footer{padding:28px 0;font:400 12px var(--mono);color:var(--muted)}
         <p class="role">Product/Data Science Fellow · 2026</p>
         <p>VoteHub is an election data and media startup. I write data features for the site, build the data sets behind them and make internal tools for election night.</p>
         <p>First, I built a national precinct data set covering 100% of the 2020 map. Next, I used it for articles on data centers, AI political ads, Trump's approval and the campus vote. Lastly, I built a race-calling console for election night.</p>
+        <div class="links"><a href="https://votehub.com/2026-campaign-tracker/" target="_blank" rel="noopener">2026 Campaign Tracker ↗</a></div>
         <div class="tags"><span>Python</span><span>Datawrapper</span><span>JavaScript</span></div>
       </div>
       <div class="panel">
@@ -344,12 +357,12 @@ footer{padding:28px 0;font:400 12px var(--mono);color:var(--muted)}
           <p>Campus precincts moved about four points further toward Democrats than their states in 2026.</p>
         </a>
       </div>
-      <div class="demo" id="demo-votehub">
-        <div class="demo-head"><span class="try">Try it</span><span>Who campaigned where in the final two months</span></div>
-        <div class="seg"><button data-v="people">Surrogates</button><button data-v="states">States</button><button data-v="party">Parties</button></div>
-        <div class="vh-chart"></div>
-        <p class="demo-note vh-note"></p>
-        <div class="links"><a href="https://votehub.com/2026-campaign-tracker/" target="_blank" rel="noopener">Explore the live 2026 Campaign Tracker ↗</a></div>
+      <p class="gal-note">Charts I made for <a href="https://votehub.com/2026/10/28/the-data-center-midterm/" target="_blank" rel="noopener">The Data Center Midterm</a></p>
+      <div class="gallery wide">
+          <figure><button class="shot" type="button"><img src="media/shots/vh-1.jpg" alt="Opposition to data centers, every repeated poll" loading="lazy"></button><figcaption>Opposition to data centers, every repeated poll</figcaption></figure>
+          <figure><button class="shot" type="button"><img src="media/shots/vh-2.jpg" alt="Republicans flipped from backing to opposing" loading="lazy"></button><figcaption>Republicans flipped from backing to opposing</figcaption></figure>
+          <figure><button class="shot" type="button"><img src="media/shots/vh-3.jpg" alt="Ten states hold 70% of the buildout" loading="lazy"></button><figcaption>Ten states hold 70% of the buildout</figcaption></figure>
+          <figure><button class="shot" type="button"><img src="media/shots/vh-4.jpg" alt="17 of the 20 biggest data center districts voted Trump" loading="lazy"></button><figcaption>17 of the 20 biggest data center districts voted Trump</figcaption></figure>
       </div>
     </article>
 
@@ -367,24 +380,11 @@ footer{padding:28px 0;font:400 12px var(--mono);color:var(--muted)}
         <video src="media/focs.mp4" poster="media/focs.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Recorded in the iPhone simulator: Today plan, focus timer, calendar, tasks"></video>
         <figcaption>Recorded in the iPhone simulator: Today plan, focus timer, calendar, tasks</figcaption>
       </figure>
-      <div class="demo" id="demo-focs">
-        <div class="demo-head"><span class="try">Try it</span><span>The Focs timer, running in your browser</span></div>
-        <div class="fx">
-          <div class="phone">
-            <div class="seg"><button data-v="pomodoro">Pomodoro</button><button data-v="flow">Flowtime</button></div>
-            <div class="fx-dial">
-              <svg viewBox="0 0 200 200" aria-hidden="true"><circle cx="100" cy="100" r="88" class="fx-ring-bg"/><circle cx="100" cy="100" r="88" class="fx-ring-fg" transform="rotate(-90 100 100)"/></svg>
-              <div class="fx-read"><span class="fx-time">25:00</span><span class="fx-phase">Focus</span></div>
-            </div>
-            <div class="fx-btns"><button class="solid fx-go">Start</button><button class="ghost fx-end" hidden>End &amp; break</button><button class="ghost fx-reset">Reset</button></div>
-            <p class="fx-log"></p>
-          </div>
-          <div class="fx-side">
-            <p><b>Pomodoro</b> runs 25 minutes of focus, then a 5-minute break.</p>
-            <p><b>Flowtime</b> counts up until you stop. Your break is a fifth of the time you focused, so a long session earns a longer rest.</p>
-            <label class="check"><input type="checkbox" class="fx-fast" checked> Demo speed (1 second = 1 minute)</label>
-          </div>
-        </div>
+      <div class="gallery tall">
+          <figure><button class="shot" type="button"><img src="media/shots/focs-today.jpg" alt="Today: the plan for the day" loading="lazy"></button><figcaption>Today: the plan for the day</figcaption></figure>
+          <figure><button class="shot" type="button"><img src="media/shots/focs-timer.jpg" alt="Focus session tied to a task" loading="lazy"></button><figcaption>Focus session tied to a task</figcaption></figure>
+          <figure><button class="shot" type="button"><img src="media/shots/focs-week.jpg" alt="Week view around your classes" loading="lazy"></button><figcaption>Week view around your classes</figcaption></figure>
+          <figure><button class="shot" type="button"><img src="media/shots/focs-fill.jpg" alt="Fill free time with tasks" loading="lazy"></button><figcaption>Fill free time with tasks</figcaption></figure>
       </div>
     </article>
 
@@ -402,20 +402,10 @@ footer{padding:28px 0;font:400 12px var(--mono);color:var(--muted)}
         <video src="media/frmat.mp4" poster="media/frmat.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Recorded in the iPhone simulator: splitting a panorama into 6 posts"></video>
         <figcaption>Recorded in the iPhone simulator: splitting a panorama into 6 posts</figcaption>
       </figure>
-      <div class="demo" id="demo-frmat">
-        <div class="demo-head"><span class="try">Try it</span><span>Split one photo into a seamless grid</span></div>
-        <div class="fm">
-          <div class="phone fm-phone">
-            <div class="fm-profile"><i></i><span><b>yourname</b><small>Preview of your profile grid</small></span></div>
-            <div class="fm-grid"></div>
-          </div>
-          <div class="fx-side">
-            <div class="seg"><button data-v="3">3 posts</button><button data-v="6">6 posts</button><button data-v="9">9 posts</button></div>
-            <p>Each tile is one post. The numbers show the order to post them in, so the picture lines up once they're all up.</p>
-            <label class="ghost file">Use your own photo<input type="file" accept="image/*" class="fm-file"></label>
-            <p class="demo-note">Your photo never leaves your browser, same as the app.</p>
-          </div>
-        </div>
+      <div class="gallery tall">
+          <figure><button class="shot" type="button"><img src="media/shots/frmat-feed.jpg" alt="A 6-post panorama in the grid" loading="lazy"></button><figcaption>A 6-post panorama in the grid</figcaption></figure>
+          <figure><button class="shot" type="button"><img src="media/shots/frmat-split.jpg" alt="Photo Splitter, 9-post preview" loading="lazy"></button><figcaption>Photo Splitter, 9-post preview</figcaption></figure>
+          <figure><button class="shot" type="button"><img src="media/shots/frmat-palette.jpg" alt="Feed Palette pulls the dominant colors" loading="lazy"></button><figcaption>Feed Palette pulls the dominant colors</figcaption></figure>
       </div>
     </article>
 
@@ -440,7 +430,7 @@ footer{padding:28px 0;font:400 12px var(--mono);color:var(--muted)}
         </ul>
       </div>
       <div class="demo" id="demo-elmo">
-        <div class="demo-head"><span class="try">Try it</span><span>The real app, running on made-up data. Tap around, nothing here is saved.</span></div>
+        <div class="demo-head"><span>The real app, running on made-up data. Tap around, nothing here is saved.</span></div>
         <div class="fm">
           <div class="device device-live">
             <div class="screen"><iframe src="latenight/" title="Late Night app demo" loading="lazy"></iframe></div>
@@ -507,7 +497,7 @@ footer{padding:28px 0;font:400 12px var(--mono);color:var(--muted)}
   els.forEach(function(e){io.observe(e)});
 })();
 </script>
-<script src="demos.js"></script>
+
 <script>
 /* Render the Late Night app at real phone width (430px) and scale it into the frame. */
 (function(){var sc=document.querySelector('.device-live .screen'); if(!sc) return; var f=sc.querySelector('iframe');
@@ -519,6 +509,13 @@ fit(); window.addEventListener('resize',fit);})();
 btn.addEventListener('click',function(){var v=box.querySelector('video'); if(!v){return;}
 var f=document.createElement('iframe'); f.src='https://bellwetherelections.com/'; f.title='Bellwether, live'; f.loading='eager'; f.allow='fullscreen';
 v.replaceWith(f); btn.textContent='Live'; btn.disabled=true;});})();
+</script>
+
+<dialog id="lb"><button class="x" aria-label="Close">×</button><img alt=""><p></p></dialog>
+<script>
+(function(){var d=document.getElementById('lb'),im=d.querySelector('img'),cap=d.querySelector('p');
+document.querySelectorAll('.gallery .shot').forEach(function(b){b.addEventListener('click',function(){var i=b.querySelector('img');im.src=i.src;im.alt=i.alt;cap.textContent=i.alt;try{d.showModal();}catch(e){d.setAttribute('open','');}});});
+d.addEventListener('click',function(e){if(e.target===d||e.target.classList.contains('x'))d.close();});})();
 </script>
 </body>
 </html>
