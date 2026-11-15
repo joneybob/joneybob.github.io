@@ -216,6 +216,12 @@ footer{padding:28px 0;font:400 12px var(--mono);color:var(--muted)}
 .browser .bar i{width:10px;height:10px;border-radius:50%;background:var(--rule);display:inline-block}
 .browser .bar span{margin-left:10px}
 .browser video{display:block;width:100%}
+.browser .bar{position:relative}
+.bw-launch{margin-left:auto;padding:6px 14px;font-size:12px;cursor:pointer}
+.bw-open{font:500 12px var(--sans);text-decoration:none;color:var(--ink);margin-left:8px}
+.browser iframe{display:block;width:100%;height:min(78vh,760px);border:0;background:#fff}
+@media (max-width:600px){.browser iframe{height:70vh}}
+
 @media (max-width:860px){.browser{grid-column:auto}}
 
 /* motion */
@@ -274,8 +280,8 @@ footer{padding:28px 0;font:400 12px var(--mono);color:var(--muted)}
           <dt>10</dt><dd>workspaces: explore, simulate, draw districts, demographics and more</dd>
         </dl>
       </div>
-      <div class="browser">
-        <div class="bar"><i></i><i></i><i></i><span>bellwetherelections.com</span></div>
+      <div class="browser" id="bw-live">
+        <div class="bar"><i></i><i></i><i></i><span>bellwetherelections.com</span><button class="bw-launch solid" type="button">Try it live</button><a class="bw-open" href="https://bellwetherelections.com" target="_blank" rel="noopener">Open ↗</a></div>
         <video src="media/bellwether.mp4" poster="media/bellwether.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Recording of Bellwether: county results for 2024, the 2020 to 2024 swing, then 2008 and 1960"></video>
       </div>
       <div class="demo" id="demo-bellwether">
@@ -500,5 +506,11 @@ footer{padding:28px 0;font:400 12px var(--mono);color:var(--muted)}
 })();
 </script>
 <script src="demos.js"></script>
+<script>
+(function(){var box=document.getElementById('bw-live'); if(!box) return; var btn=box.querySelector('.bw-launch');
+btn.addEventListener('click',function(){var v=box.querySelector('video'); if(!v){return;}
+var f=document.createElement('iframe'); f.src='https://bellwetherelections.com/'; f.title='Bellwether, live'; f.loading='eager'; f.allow='fullscreen';
+v.replaceWith(f); btn.textContent='Live'; btn.disabled=true;});})();
+</script>
 </body>
 </html>
