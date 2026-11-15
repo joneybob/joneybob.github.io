@@ -224,9 +224,9 @@ footer{padding:28px 0;font:400 12px var(--mono);color:var(--muted)}
 
 @media (max-width:860px){.browser{grid-column:auto}}
 
-.device-live{width:min(360px,100%)}
-.device-live iframe{display:block;width:100%;height:680px;border:8px solid var(--ink);border-radius:36px;background:#0B0D10;box-shadow:0 30px 60px -30px rgba(0,0,0,.35)}
-@media (max-width:600px){.device-live iframe{height:600px}}
+.device-live{width:min(330px,100%)}
+.device-live .screen{position:relative;overflow:hidden;border:8px solid var(--ink);border-radius:36px;background:#0B0D10;box-shadow:0 30px 60px -30px rgba(0,0,0,.35);height:640px}
+.device-live iframe{position:absolute;top:0;left:0;width:430px;height:900px;border:0;transform-origin:0 0}
 /* motion */
 .reveal{opacity:0;transform:translateY(14px);transition:opacity .7s ease,transform .7s ease}
 .reveal.in{opacity:1;transform:none}
@@ -443,7 +443,7 @@ footer{padding:28px 0;font:400 12px var(--mono);color:var(--muted)}
         <div class="demo-head"><span class="try">Try it</span><span>The real app, running on made-up data. Tap around, nothing here is saved.</span></div>
         <div class="fm">
           <div class="device device-live">
-            <iframe src="latenight/" title="Late Night app demo" loading="lazy"></iframe>
+            <div class="screen"><iframe src="latenight/" title="Late Night app demo" loading="lazy"></iframe></div>
           </div>
           <div class="fx-side">
             <p><b>Guest list.</b> One search finds a guest and the brother who invited them. One tap checks them in.</p>
@@ -508,6 +508,12 @@ footer{padding:28px 0;font:400 12px var(--mono);color:var(--muted)}
 })();
 </script>
 <script src="demos.js"></script>
+<script>
+/* Render the Late Night app at real phone width (430px) and scale it into the frame. */
+(function(){var sc=document.querySelector('.device-live .screen'); if(!sc) return; var f=sc.querySelector('iframe');
+function fit(){var k=sc.clientWidth/430; f.style.transform='scale('+k+')'; f.style.height=(sc.clientHeight/k)+'px';}
+fit(); window.addEventListener('resize',fit);})();
+</script>
 <script>
 (function(){var box=document.getElementById('bw-live'); if(!box) return; var btn=box.querySelector('.bw-launch');
 btn.addEventListener('click',function(){var v=box.querySelector('video'); if(!v){return;}
