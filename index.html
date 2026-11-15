@@ -224,6 +224,9 @@ footer{padding:28px 0;font:400 12px var(--mono);color:var(--muted)}
 
 @media (max-width:860px){.browser{grid-column:auto}}
 
+.device-live{width:min(360px,100%)}
+.device-live iframe{display:block;width:100%;height:680px;border:8px solid var(--ink);border-radius:36px;background:#0B0D10;box-shadow:0 30px 60px -30px rgba(0,0,0,.35)}
+@media (max-width:600px){.device-live iframe{height:600px}}
 /* motion */
 .reveal{opacity:0;transform:translateY(14px);transition:opacity .7s ease,transform .7s ease}
 .reveal.in{opacity:1;transform:none}
@@ -437,18 +440,17 @@ footer{padding:28px 0;font:400 12px var(--mono);color:var(--muted)}
         </ul>
       </div>
       <div class="demo" id="demo-elmo">
-        <div class="demo-head"><span class="try">Try it</span><span>You're working the door. Search a name and check them in.</span></div>
+        <div class="demo-head"><span class="try">Try it</span><span>The real app, running on made-up data. Tap around, nothing here is saved.</span></div>
         <div class="fm">
-          <div class="phone el-phone">
-            <div class="el-top"><b>Late Night</b><span class="el-count"></span></div>
-            <div class="el-bar"><i></i></div>
-            <input class="el-q" type="search" placeholder="Search a guest or brother" aria-label="Search guest name">
-            <div class="el-list"></div>
+          <div class="device device-live">
+            <iframe src="latenight/" title="Late Night app demo" loading="lazy"></iframe>
           </div>
           <div class="fx-side">
-            <p>Every brother adds his guests ahead of time. At the door, one search finds the guest and who invited them, and one tap checks them in.</p>
-            <p>Anyone who never shows up gets logged, so the social team knows who to remind next time.</p>
-            <p class="demo-note">Names here are made up for the demo.</p>
+            <p><b>Guest list.</b> One search finds a guest and the brother who invited them. One tap checks them in.</p>
+            <p><b>Lineup.</b> Every role for the night, from setup and door shifts to DJ and cleanup. "Auto-fill open roles" spreads the work by who has done the least.</p>
+            <p><b>Checklist, door rules and tally.</b> The setup list, the rules for each door shift, and a running count of who has worked and who no-showed.</p>
+            <div class="links"><a href="latenight/" target="_blank" rel="noopener">Open full screen ↗</a></div>
+            <p class="demo-note">This is the same code the house uses, with the database swapped for an in-memory one. Every name is invented.</p>
           </div>
         </div>
       </div>

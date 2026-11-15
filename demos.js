@@ -191,31 +191,4 @@
     sample();
   })();
 
-  /* ---------- 05 Late Night: door check-in ---------- */
-  (function () {
-    var root = $("#demo-elmo"); if (!root) return;
-    var G = [
-      ["Ava Martinez","Sam"],["Ben Okafor","Sam"],["Chloe Park","Priya"],["Daniel Cohen","Priya"],["Ella Brooks","Marcus"],
-      ["Felix Wang","Marcus"],["Grace Liu","Jordan"],["Henry Adams","Jordan"],["Isla Novak","Sam"],["Jack Rivera","Priya"],
-      ["Kira Patel","Marcus"],["Leo Fischer","Jordan"],["Maya Singh","Sam"],["Noah Kim","Priya"],["Olivia Grant","Marcus"],
-      ["Owen Hart","Jordan"],["Ruby Chen","Sam"],["Theo Silva","Priya"]
-    ].map(function (g) { return { name: g[0], host: g[1], in: false }; });
-    var list = $(".el-list", root), q = $(".el-q", root), count = $(".el-count", root), bar = $(".el-bar i", root);
-    function render() {
-      var term = q.value.trim().toLowerCase(), n = 0;
-      list.innerHTML = "";
-      G.forEach(function (g) {
-        if (g.in) n++;
-        if (term && g.name.toLowerCase().indexOf(term) < 0 && g.host.toLowerCase().indexOf(term) < 0) return;
-        var b = el("button", "el-row" + (g.in ? " in" : ""), "<span><b>" + g.name + "</b><small>Guest of " + g.host + "</small></span><em>" + (g.in ? "In ✓" : "Check in") + "</em>");
-        b.addEventListener("click", function () { g.in = !g.in; render(); });
-        list.appendChild(b);
-      });
-      if (!list.children.length) list.appendChild(el("p", "el-empty", "Not on the list."));
-      count.textContent = n + " / " + G.length + " checked in";
-      bar.style.width = (n / G.length * 100) + "%";
-    }
-    q.addEventListener("input", render);
-    render();
-  })();
 })();

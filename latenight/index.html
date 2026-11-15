@@ -1,0 +1,1082 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Late Night · Demo</title>
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Late Night">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}
+#gate{position:fixed;inset:0;z-index:50;background:#0B0D10;color:#F2F4F7;display:grid;place-items:center;padding:24px max(16px,env(safe-area-inset-right,0px)) 24px max(16px,env(safe-area-inset-left,0px));font-family:"Inter Tight",system-ui,-apple-system,sans-serif}
+#gate .box{width:100%;max-width:22rem;display:flex;flex-direction:column;gap:14px;align-items:center;text-align:center}
+#gate img{width:96px;height:96px;border-radius:50%;border:1px solid #272C35}
+#gate h1{font:700 2.25rem/1 "Cormorant SC",Garamond,serif;margin:4px 0 0;letter-spacing:.02em}
+#gate p{margin:0;color:#8B93A3;font-size:.9375rem}
+#gate form{display:flex;flex-direction:column;gap:10px;width:100%}
+#gate input{font:500 18px "Inter Tight",system-ui,sans-serif;text-align:center;letter-spacing:.08em;padding:14px;border-radius:8px;border:2px solid #272C35;background:#14171C;color:#F2F4F7;width:100%;box-sizing:border-box}
+#gate input:focus{outline:none;border-color:#FFFFFF}
+#gate button{font:600 16px "Inter Tight",system-ui,sans-serif;min-height:48px;border-radius:8px;border:0;background:#FFFFFF;color:#000000;cursor:pointer}
+#gate .err{color:#FF8F80;min-height:1.2em;font-size:.875rem}
+#door-dlg form{display:flex;flex-direction:column;gap:.625rem;padding:0 .875rem 1rem}
+#door-dlg input{text-align:center;letter-spacing:.2em;font-size:20px}
+</style>
+</head>
+<body>
+<div id="gate">
+  <div class="box">
+    <img src="icon-192.png" alt="">
+    <h1>Late Night</h1>
+    <p id="gate-msg">Connecting…</p>
+    <form id="gate-form" hidden>
+      <input id="gate-code" type="password" inputmode="text" autocomplete="off" autocapitalize="off" placeholder="House code" aria-label="House code" required>
+      <button type="submit">Enter</button>
+      <span class="err" id="gate-err"></span>
+    </form>
+  </div>
+</div>
+<dialog id="door-dlg" aria-labelledby="door-title">
+  <div class="dlg-head"><h2 id="door-title">Door PIN</h2><button class="btn small" type="button" id="door-close">Close</button></div>
+  <form id="door-form">
+    <p class="hint">Only whoever is working door can check people in.</p>
+    <input id="door-pin" type="password" inputmode="numeric" autocomplete="off" placeholder="PIN" aria-label="Door PIN" required>
+    <button class="btn primary" type="submit">Unlock door</button>
+    <span class="status bad" id="door-err"></span>
+  </form>
+</dialog>
+<script>
+/* Bridge: the app asks for "db" and "user"; Firebase answers once the house code is accepted. */
+(function(){
+  var resolveReady;
+  window.__elmoReady=new Promise(function(r){resolveReady=r;});
+  window.__elmoResolve=resolveReady;
+  window.claude={use:function(name){return window.__elmoReady.then(function(api){return api[name]||null;});}};
+})();
+</script>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+SC:wght@600;700&family=Inter+Tight:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: St. Elmo house style. Black ground, white Maltese cross, one pale-blue accent. One column; clock times in a left rail, roles hang off each time. Single dark theme by choice. */
+:root{
+  --bg:#0B0D10; --surface:#14171C; --sunk:#090A0C; --ink:#F2F4F7; --muted:#8B93A3; --line:#272C35;
+  --accent:#FFFFFF; --accent-ink:#000000; --accent-text:#FFFFFF;
+  --open-bg:#1C2027; --open-line:#59606C;
+  --ok:#7FD8A8; --ok-bg:#12291D; --bad:#FF8F80; --bad-bg:#33181A;
+  --scrim:rgba(0,0,0,.72);
+  --display:"Cormorant SC","Cormorant",Garamond,"Times New Roman",serif;
+  --body:"Inter Tight",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);font:400 15px/1.45 var(--body)}
+h1,h2,h3,p,ul,ol{margin:0}
+ul,ol{padding:0;list-style:none}
+:focus-visible{outline:2px solid var(--accent-text);outline-offset:2px}
+
+.app{max-width:46rem;margin-inline:auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:1.25rem 5rem;display:flex;flex-direction:column;gap:1rem}
+
+.mast{display:flex;flex-direction:column;gap:.75rem}
+.mast-top{display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:14px;min-width:0}
+.seal{flex:none;width:58px;height:58px;border-radius:50%;background:#000;display:grid;place-items:center}
+.seal svg{width:30px;height:30px}
+.brand-text{display:grid;gap:3px;min-width:0}
+.mast h1{font:700 2.25rem/.95 var(--display);letter-spacing:.02em;text-wrap:balance}
+.brand small{font-size:.875rem;color:var(--muted)}
+.brand small i{font-family:var(--display);font-style:normal;color:var(--accent);letter-spacing:.06em}
+.night-bar,.inline-form{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
+.label{font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+select,input[type=text],input[type=date],input[type=search],textarea{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:.45rem .625rem;min-height:40px;min-width:0;max-width:100%}
+textarea{width:100%;min-height:7rem;resize:vertical;line-height:1.4}
+#night-select{flex:1 1 11rem;max-width:18rem}
+
+.btn{font:600 .9375rem/1.1 var(--body);min-height:40px;padding:.5rem .875rem;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.btn.primary{background:var(--accent);border-color:transparent;color:var(--accent-ink)}
+.btn.small{min-height:34px;padding:.35rem .625rem;font-size:.8125rem}
+.btn.danger{color:var(--bad)}
+.btn[aria-pressed=true]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn:disabled{opacity:.45;cursor:default}
+.chip{font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;padding:.25rem .5rem;border:1px solid var(--line);border-radius:999px;color:var(--muted)}
+
+.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;gap:.25rem;overflow-x:auto;border-bottom:1px solid var(--line)}
+.tabs a{flex:none;padding:.75rem .625rem;font-weight:600;color:var(--muted);text-decoration:none;border-bottom:3px solid transparent}
+.tabs a[aria-current=page]{color:var(--ink);border-bottom-color:var(--accent)}
+
+main section{display:flex;flex-direction:column;gap:1rem}
+#lineup-body,#checklist-body,#tally-body,#roster-body{display:flex;flex-direction:column;gap:.875rem}
+#checklist-body{gap:1.125rem}
+#tally-body h2:not(:first-child){margin-top:.75rem}
+.empty{padding:1.25rem;border:1px dashed var(--line);border-radius:8px;color:var(--muted);max-width:38rem}
+.hint{color:var(--muted);font-size:.875rem;max-width:38rem}
+h2{font:700 1.5rem/1 var(--display);letter-spacing:.03em}
+h3{font-size:.8125rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+
+.summary{display:flex;flex-direction:column;gap:.5rem}
+.count{font-size:1.0625rem}
+.count strong{font:700 2.25rem/1 var(--display);font-variant-numeric:tabular-nums;margin-right:.125rem}
+.open-n{margin-left:.5rem;padding:.125rem .5rem;border-radius:999px;background:var(--open-bg);border:1px solid var(--open-line);color:var(--accent-text);font-weight:600;font-size:.8125rem}
+.pips{display:flex;gap:4px;flex-wrap:wrap}
+.pip{width:14px;height:8px;border-radius:2px;background:var(--ink)}
+.pip.open{background:transparent;border:1px dashed var(--open-line)}
+.actions{display:flex;gap:.5rem;flex-wrap:wrap}
+.banner{padding:.625rem .75rem;border-radius:6px;display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
+.banner.ok{background:var(--ok-bg);color:var(--ok)}
+.banner.warn{background:var(--open-bg);color:var(--accent-text);border:1px solid var(--open-line)}
+.banner.bad{background:var(--bad-bg);color:var(--bad)}
+
+.block{display:grid;grid-template-columns:4.25rem minmax(0,1fr);gap:.75rem;padding-block:.875rem;border-top:1px solid var(--line)}
+.block:first-child{border-top:0}
+.clock{font:700 1.75rem/1 var(--display);font-variant-numeric:tabular-nums;padding-top:.4rem}
+.clock.word{font-size:1.125rem;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);padding-top:.65rem}
+.slots{display:flex;flex-direction:column;gap:.375rem}
+.slot{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:.5rem;align-items:center}
+.slot.editing{grid-template-columns:minmax(0,1fr) minmax(0,1.15fr) auto}
+.what{display:flex;gap:.25rem .375rem;align-items:center;flex-wrap:wrap;min-width:0}
+.role{font-weight:600}
+.note{flex-basis:100%;font-size:.8125rem;color:var(--muted)}
+.tag{font-size:.6875rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;padding:.0625rem .375rem;border-radius:3px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.tag.social{border-color:var(--open-line);color:var(--accent-text)}
+.who{display:block;width:100%;text-align:left;min-height:40px;border-radius:6px;padding:.5rem .625rem;font:500 .9375rem/1.2 var(--body);border:1px solid var(--line);background:var(--surface);color:var(--ink);overflow-wrap:anywhere}
+button.who{cursor:pointer}
+.who.open{background:var(--open-bg);border:1px dashed var(--open-line);color:var(--accent-text);font-weight:600}
+.dbl{display:block;font-size:.75rem;color:var(--accent-text);font-weight:600}
+.noshows ul{display:flex;flex-direction:column;gap:.375rem;margin-top:.5rem}
+.noshows li{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
+
+.panel{display:flex;flex-direction:column;gap:.625rem;padding:.875rem;background:var(--sunk);border-radius:8px}
+.fields{display:flex;gap:.5rem;flex-wrap:wrap;align-items:flex-end}
+.field{display:flex;flex-direction:column;gap:.25rem;min-width:0;flex:1 1 9rem}
+.field.grow{flex:2 1 14rem}
+.field input,.field select{width:100%}
+.checkline{display:flex;gap:.5rem;align-items:center}
+.checkline input{width:18px;height:18px;accent-color:var(--accent-text)}
+
+.clist{display:flex;flex-direction:column;gap:.5rem}
+.clist-head{display:flex;justify-content:space-between;align-items:baseline;gap:.5rem;border-bottom:1px solid var(--line);padding-bottom:.375rem}
+.clist-head .n{font-variant-numeric:tabular-nums;color:var(--muted);font-size:.8125rem}
+.clist li{display:flex;gap:.5rem;align-items:flex-start}
+.check{flex:1;min-width:0;display:grid;grid-template-columns:22px minmax(0,1fr);gap:.625rem;align-items:start;padding:.4rem 0;cursor:pointer}
+.check input{width:20px;height:20px;margin:.1rem 0 0;accent-color:var(--accent-text)}
+.ctext{font-weight:500}
+.cdetail{display:block;color:var(--muted);font-size:.875rem;font-weight:400}
+.check input:checked + .cbody .ctext{text-decoration:line-through;color:var(--muted)}
+
+.door{display:grid;grid-template-columns:4.25rem minmax(0,1fr);gap:.75rem;padding-block:1rem;border-top:1px solid var(--line)}
+.door:first-of-type{border-top:0}
+.door-body{display:flex;flex-direction:column;gap:.5rem;min-width:0}
+.door-title{font-size:1.0625rem;font-weight:600}
+.on-door{font-size:.875rem;color:var(--muted)}
+.on-door strong{color:var(--ink);font-weight:600}
+.rules{display:flex;flex-direction:column;gap:.375rem;max-width:36rem}
+.rules li{padding-left:1rem;position:relative}
+.rules li::before{content:"";position:absolute;left:0;top:.6em;width:6px;height:2px;background:var(--accent-text)}
+
+.upnext{display:flex;gap:.375rem;flex-wrap:wrap;counter-reset:u}
+.upnext li{counter-increment:u;display:flex;gap:.375rem;align-items:baseline;padding:.3rem .625rem;border:1px solid var(--line);border-radius:999px;background:var(--surface);max-width:100%}
+.upnext li::before{content:counter(u);font:700 1rem/1 var(--display);color:var(--accent-text)}
+.upnext .un-n{color:var(--muted);font-size:.8125rem;font-variant-numeric:tabular-nums;white-space:nowrap}
+.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+th,td{padding:.5rem .5rem;text-align:right;white-space:nowrap;border-bottom:1px solid var(--line)}
+tbody tr:last-child td{border-bottom:0}
+th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:var(--surface);max-width:11rem;overflow:hidden;text-overflow:ellipsis}
+th{font-size:.6875rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
+td.z{color:var(--muted);opacity:.55}
+td.strong{font-weight:600}
+td.nsd{color:var(--bad);font-weight:600}
+tr.skipped td{color:var(--muted)}
+
+.members{display:flex;flex-direction:column}
+.member{display:flex;gap:.375rem;align-items:center;flex-wrap:wrap;padding-block:.5rem;border-top:1px solid var(--line)}
+.member:first-child{border-top:0}
+.mname{flex:1 1 12rem}
+@media (max-width:520px){.mname{flex-basis:100%}}
+
+dialog{border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);padding:0;width:min(28rem,calc(100vw - 32px));max-height:min(82vh,42rem);overflow:hidden}
+dialog[open]{display:flex;flex-direction:column}
+dialog::backdrop{background:var(--scrim)}
+.dlg-head{display:flex;justify-content:space-between;align-items:center;gap:.5rem;padding:.875rem .875rem .5rem}
+.dlg-head h2{font-size:1.375rem}
+.dlg-body{display:flex;flex-direction:column;gap:.625rem;padding:0 .875rem .875rem;overflow-y:auto;min-height:0}
+.dlg-body input[type=search]{width:100%}
+.current{display:flex;flex-direction:column;gap:.5rem;padding:.625rem;background:var(--sunk);border-radius:6px}
+.current .row{display:flex;gap:.375rem;flex-wrap:wrap}
+.people{display:flex;flex-direction:column;gap:.25rem}
+.people .div{padding:.5rem 0 .125rem}
+.person{display:flex;flex-direction:column;gap:.125rem;width:100%;text-align:left;padding:.5rem .625rem;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);font:inherit;cursor:pointer}
+.person:disabled{opacity:.5;cursor:default}
+.pname{font-weight:600;display:flex;gap:.375rem;align-items:center;flex-wrap:wrap}
+.pmeta{font-size:.8125rem;color:var(--muted)}
+.pmeta .also{color:var(--accent-text);font-weight:600}
+
+/* guests */
+#guests-body,#list-body{display:flex;flex-direction:column;gap:.875rem}
+.gslots{display:flex;flex-direction:column;gap:.5rem}
+.gslot{display:grid;grid-template-columns:1.5rem minmax(0,1fr);gap:.5rem;align-items:center}
+.gslot span{color:var(--muted);font-variant-numeric:tabular-nums;text-align:right;font-size:.875rem}
+.gslot input{width:100%}
+#g-member{width:100%;max-width:22rem}
+.status{font-size:.875rem;color:var(--muted)}
+.status.ok{color:var(--ok)}
+.status.bad{color:var(--bad)}
+.search-bar{position:sticky;top:calc(env(safe-area-inset-top,0px) + 3rem);z-index:4;background:var(--bg);display:flex;flex-direction:column;gap:.5rem;padding-block:.25rem .5rem}
+#gl-q{width:100%;font-size:1.375rem;min-height:56px;padding:.75rem 1rem;border-width:2px}
+#gl-q:focus{border-color:var(--accent)}
+.gl-row{display:flex;gap:.75rem;align-items:center;flex-wrap:wrap}
+#gl-by{flex:1 1 12rem;max-width:18rem}
+.gcount{color:var(--muted);font-variant-numeric:tabular-nums;font-size:.875rem}
+.gcount b{color:var(--ink);font-weight:600}
+.glist{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:8px;background:var(--surface);overflow:hidden}
+.ghead{display:flex;justify-content:space-between;gap:.5rem;padding:.5rem .875rem;background:var(--sunk);border-top:1px solid var(--line);font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.ghead:first-child{border-top:0}
+.guest{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.75rem;align-items:center;padding:.75rem .875rem;border-top:1px solid var(--line)}
+.ghead+.guest,.guest:first-child{border-top:0}
+.gname{font-size:1.125rem;font-weight:600;overflow-wrap:anywhere}
+.gvia{font-size:.8125rem;color:var(--muted)}
+.guest.in .gname{color:var(--accent)}
+.gacts{display:flex;gap:.375rem;align-items:center}
+.chk{font:600 .875rem var(--body);min-height:40px;padding:.4rem .875rem;border-radius:999px;border:2px solid var(--line);background:transparent;color:var(--ink);cursor:pointer;white-space:nowrap}
+.guest.in .chk{border-color:var(--accent);background:var(--open-bg);color:var(--accent)}
+.gx{background:transparent;border:0;color:var(--muted);font-size:1.25rem;padding:.25rem .5rem;cursor:pointer;border-radius:4px}
+mark{background:rgba(255,255,255,.2);color:inherit;border-radius:2px}
+
+/* phone */
+select,input[type=text],input[type=date],input[type=search],textarea{font-size:16px}
+.tabs{scrollbar-width:none;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity}
+.tabs::-webkit-scrollbar{display:none}
+.tabs a{scroll-snap-align:start;min-height:44px;display:flex;align-items:center}
+.btn,.chk,.who{min-height:44px}
+.btn.small{min-height:38px}
+.check input{width:22px;height:22px}
+@media (max-width:560px){
+  .app{padding-block:.75rem 6rem;gap:.75rem}
+  .mast{gap:.5rem}
+  .seal{width:44px;height:44px}
+  .seal svg{width:24px;height:24px}
+  .brand{gap:10px}
+  .mast h1{font-size:1.75rem}
+  .brand small{font-size:.75rem;line-height:1.3}
+  .night-bar{flex-wrap:nowrap}
+  #night-select{flex:1 1 auto;max-width:none}
+  #new-night-btn{white-space:nowrap}
+  .tabs a{padding:.625rem .5rem;font-size:.9375rem}
+  .search-bar{top:calc(env(safe-area-inset-top,0px) + 2.75rem)}
+  #gl-q{font-size:1.25rem;min-height:52px}
+  #gl-by{flex:1 1 100%;max-width:none}
+  .guest{padding:.75rem;gap:.5rem}
+  .gname{font-size:1.0625rem}
+  .chk{padding:.4rem .75rem}
+  .block{grid-template-columns:3.25rem minmax(0,1fr);gap:.5rem}
+  .clock{font-size:1.375rem}
+  .slot,.slot.editing{grid-template-columns:minmax(0,1fr);gap:.25rem;padding-bottom:.375rem}
+  .door{grid-template-columns:3.25rem minmax(0,1fr);gap:.5rem}
+  .actions .btn{flex:1 1 auto}
+  .fields{flex-direction:column;align-items:stretch}
+  .field,.field.grow{flex:1 1 auto}
+  #g-member{max-width:none}
+  .count strong{font-size:1.875rem}
+  dialog{width:100vw;max-width:100vw;max-height:85vh;margin:auto 0 0;border-radius:14px 14px 0 0;border-bottom:0;padding-bottom:env(safe-area-inset-bottom,0px)}
+  .member .btn.small{flex:1 1 auto}
+}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(1rem + env(safe-area-inset-bottom,0px));z-index:20;display:flex;gap:.75rem;align-items:center;max-width:calc(100vw - 32px);padding:.625rem .875rem;border-radius:8px;background:var(--ink);color:var(--bg);font-weight:500}
+#toast .btn{background:transparent;color:var(--bg);border-color:currentColor}
+</style>
+
+<div class="app">
+  <header class="mast">
+    <div class="mast-top">
+      <div class="brand">
+        <div class="seal" aria-hidden="true"><svg viewBox="0 0 100 100"><path fill="#fff" d="M50 50 L32 4 L50 18 L68 4 Z M50 50 L96 32 L82 50 L96 68 Z M50 50 L68 96 L50 82 L32 96 Z M50 50 L4 68 L18 50 L4 32 Z"/></svg></div>
+        <div class="brand-text"><h1>Late Night</h1><small>St. Elmo Club · Eta chapter, Delta Phi · <i>semper ubique</i></small></div>
+      </div>
+      <span class="chip" id="access-chip" hidden>View only</span>
+    </div>
+    <div class="night-bar">
+      <label class="label" for="night-select">Night</label>
+      <select id="night-select" disabled><option value="">Loading</option></select>
+      <button class="btn" type="button" id="new-night-btn" data-act="new-night-toggle" hidden>New late night</button>
+    </div>
+    <form id="new-night-form" class="inline-form" hidden>
+      <label class="label" for="new-night-date">Date</label>
+      <input type="date" id="new-night-date" required>
+      <button class="btn primary" type="submit">Start this night</button>
+    </form>
+  </header>
+
+  <nav class="tabs" aria-label="Sections">
+    <a href="#list" data-tab="list">Guest list</a>
+    <a href="#guests" data-tab="guests">My guests</a>
+    <a href="#lineup" data-tab="lineup">Lineup</a>
+    <a href="#checklist" data-tab="checklist">Checklist</a>
+    <a href="#door" data-tab="door">Door rules</a>
+    <a href="#tally" data-tab="tally">Tally</a>
+    <a href="#roster" data-tab="roster">Roster</a>
+  </nav>
+
+  <main>
+    <section id="view-guests" hidden>
+      <div id="guests-body"></div>
+      <form id="guest-form" class="panel" hidden>
+        <h3>Your guests</h3>
+        <p class="hint">Pick your name, then list up to 5 people with first and last names so the door can find them. Your list stays on for every late night until you change it.</p>
+        <div class="field"><label class="label" for="g-member">I am</label><select id="g-member"></select></div>
+        <p id="g-claim" class="banner bad" hidden></p>
+        <div class="gslots">
+          <div class="gslot"><span>1</span><input type="text" id="g-0" placeholder="First Last" autocomplete="off" maxlength="60" aria-label="Guest 1"></div>
+          <div class="gslot"><span>2</span><input type="text" id="g-1" placeholder="First Last" autocomplete="off" maxlength="60" aria-label="Guest 2"></div>
+          <div class="gslot"><span>3</span><input type="text" id="g-2" placeholder="First Last" autocomplete="off" maxlength="60" aria-label="Guest 3"></div>
+          <div class="gslot"><span>4</span><input type="text" id="g-3" placeholder="First Last" autocomplete="off" maxlength="60" aria-label="Guest 4"></div>
+          <div class="gslot"><span>5</span><input type="text" id="g-4" placeholder="First Last" autocomplete="off" maxlength="60" aria-label="Guest 5"></div>
+        </div>
+        <div class="actions" style="align-items:center"><button class="btn primary" type="submit" id="g-save">Save my list</button><span id="g-status" class="status"></span></div>
+      </form>
+    </section>
+
+    <section id="view-list" hidden>
+      <div class="search-bar" id="gl-bar" hidden>
+        <input type="search" id="gl-q" placeholder="Search a name" aria-label="Search guest name" autocomplete="off">
+        <div class="gl-row">
+          <select id="gl-by" aria-label="Filter by brother"><option value="">All brothers</option></select>
+          <span class="gcount" id="gl-count"></span>
+        </div>
+      </div>
+      <div id="list-body"></div>
+    </section>
+
+    <section id="view-lineup" hidden>
+      <div id="lineup-body"></div>
+      <form id="slot-form" class="panel" hidden>
+        <h3>Add a role to this night</h3>
+        <div class="fields">
+          <div class="field grow"><label class="label" for="slot-role">Role</label><input type="text" id="slot-role" list="role-list" placeholder="Stairs" required autocomplete="off"><datalist id="role-list"><option value="Pre-event setup"><option value="Event setup"><option value="Door"><option value="Stairs"><option value="Bar"><option value="DJ"><option value="Clean up"></datalist></div>
+          <div class="field"><label class="label" for="slot-time">Time</label><input type="text" id="slot-time" list="time-list" placeholder="3:30" required autocomplete="off"><datalist id="time-list"><option value="Before"><option value="1:20"><option value="1:50"><option value="2:00"><option value="2:30"><option value="3:00"><option value="3:30"><option value="After"></datalist></div>
+          <div class="field"><label class="label" for="slot-seat">Who can take it</label><select id="slot-seat"><option value="any">Anyone</option><option value="brother">Brother</option><option value="social">Social team</option></select></div>
+          <button class="btn primary" type="submit">Add role</button>
+        </div>
+        <div class="actions">
+          <button class="btn small" type="button" data-act="save-default">Use this role list for new nights</button>
+          <button class="btn small danger" type="button" data-act="delete-night">Delete this night</button>
+        </div>
+      </form>
+    </section>
+
+    <section id="view-checklist" hidden>
+      <div id="checklist-body"></div>
+      <form id="item-form" class="panel" hidden>
+        <h3>Add a checklist item</h3>
+        <div class="fields">
+          <div class="field"><label class="label" for="item-section">Section</label><select id="item-section"><option value="supplies">Supplies</option><option value="pre">Pre-event setup</option><option value="during">During-event setup</option></select></div>
+          <div class="field grow"><label class="label" for="item-text">Item</label><input type="text" id="item-text" placeholder="Turn on the lights" required autocomplete="off"></div>
+          <div class="field grow"><label class="label" for="item-detail">Detail (optional)</label><input type="text" id="item-detail" placeholder="Switch is behind the bar" autocomplete="off"></div>
+          <button class="btn primary" type="submit">Add item</button>
+        </div>
+      </form>
+    </section>
+
+    <section id="view-door" hidden><div id="door-body"></div></section>
+
+    <section id="view-tally" hidden><div id="tally-body"></div></section>
+
+    <section id="view-roster" hidden>
+      <form id="roster-form" class="panel" hidden>
+        <label class="label" for="roster-names">Add names, one per line</label>
+        <textarea id="roster-names" placeholder="Paste the house roster here"></textarea>
+        <div class="actions">
+          <label class="checkline" for="roster-social"><input type="checkbox" id="roster-social"> These names are on the social team</label>
+          <button class="btn primary" type="submit">Add to roster</button>
+        </div>
+      </form>
+      <div id="roster-body"></div>
+    </section>
+  </main>
+</div>
+
+<dialog id="picker" aria-labelledby="picker-title">
+  <div class="dlg-head"><h2 id="picker-title">Role</h2><button class="btn small" type="button" data-act="close-picker">Close</button></div>
+  <div class="dlg-body">
+    <div id="picker-current"></div>
+    <input type="search" id="picker-search" placeholder="Search names" aria-label="Search names" autocomplete="off">
+    <ul class="people" id="picker-list"></ul>
+  </div>
+</dialog>
+
+<dialog id="copy-dialog" aria-labelledby="copy-title">
+  <div class="dlg-head"><h2 id="copy-title">Copy this</h2><button class="btn small" type="button" data-act="close-copy">Close</button></div>
+  <div class="dlg-body">
+    <p class="hint">Select the text and copy it.</p>
+    <textarea id="copy-text" readonly aria-label="Text to copy"></textarea>
+  </div>
+</dialog>
+
+<div id="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+(function(){
+'use strict';
+function $(s,r){return (r||document).querySelector(s);}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function clone(x){return JSON.parse(JSON.stringify(x));}
+function newId(p){return p+Math.random().toString(36).slice(2,10);}
+function store(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v);}catch(e){}return null;}
+
+var TABS=['list','guests','lineup','checklist','door','tally','roster'];
+var MAXG=5;
+var CATS=['Setup','Door','Stairs','Bar','DJ','Clean up'];
+var SECTIONS=[['supplies','Supplies'],['pre','Pre-event setup'],['during','During-event setup']];
+var Z={done:0,up:0,ns:0,last:'',cats:{},tonight:[]};
+var S={db:null,phase:'loading',canWrite:true,cfg:null,cfgLoaded:false,rosterExists:false,members:[],mById:{},membersLoaded:false,
+  nights:[],nightsLoaded:false,nightId:store('lnb-night')||null,tab:'lineup',editSlots:false,editList:false,pickSlot:null,
+  confirm:null,confirmRm:null,lastFill:null,showNew:false,rosterDirty:false,selSig:null,
+  myId:null,isOwner:false,guests:{},guestsLoaded:false,checkins:{},checkinsLoaded:false,formSig:null,optSig:null};
+
+/* ---------- small helpers ---------- */
+function night(){for(var i=0;i<S.nights.length;i++){if(S.nights[i].id===S.nightId)return S.nights[i];}return null;}
+function nightPath(){return 'nights/'+S.nightId;}
+function isClock(t){return /^\d/.test(String(t||''));}
+function ordOf(t){t=String(t||'').trim().toLowerCase();var m=/^(\d{1,2})(?::(\d{2}))?/.exec(t);if(m)return ((+m[1])%12)*60+(+(m[2]||0));if(/^(before|pre|set)/.test(t))return -1;return 100000;}
+function slotLabel(s){return s.role+(isClock(s.t)?' '+s.t:'');}
+function catOf(role){var r=role.toLowerCase();if(r.indexOf('door')>=0)return 'Door';if(r.indexOf('stair')>=0)return 'Stairs';if(r.indexOf('bar')>=0)return 'Bar';if(r.indexOf('dj')>=0||r.indexOf('music')>=0)return 'DJ';if(r.indexOf('clean')>=0)return 'Clean up';if(r.indexOf('set')>=0)return 'Setup';return 'Other';}
+function groups(n){var map={},out=[];(n.slots||[]).forEach(function(s){var k=String(s.t||'After');if(!map[k]){map[k]={t:k,slots:[]};out.push(map[k]);}map[k].slots.push(s);});out.sort(function(a,b){return ordOf(a.t)-ordOf(b.t);});return out;}
+function fmtDate(d,long){var p=/^(\d{4})-(\d{2})-(\d{2})/.exec(d||'');if(!p)return d||'No date';var dt=new Date(+p[1],+p[2]-1,+p[3]);return dt.toLocaleDateString(undefined,long?{weekday:'long',month:'long',day:'numeric'}:{weekday:'short',month:'short',day:'numeric'});}
+function todayStr(){var d=new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);}
+function nameOf(id){var m=S.mById[id];return m?m.name:'Removed member';}
+function seatTag(s){return s.seat==='social'?'<span class="tag social">Social team</span>':s.seat==='brother'?'<span class="tag">Brother</span>':'';}
+
+var toastT=0;
+function toast(msg,action){var el=$('#toast');el.innerHTML='<span>'+esc(msg)+'</span>'+(action?'<button class="btn small" type="button" data-act="'+action.act+'">'+esc(action.label)+'</button>':'');el.hidden=false;clearTimeout(toastT);toastT=setTimeout(function(){el.hidden=true;},action?9000:4200);}
+function openDlg(d){try{if(!d.open)d.showModal();}catch(e){d.setAttribute('open','');}}
+function closeDlg(d){try{d.close();}catch(e){d.removeAttribute('open');}}
+
+/* ---------- saving ---------- */
+var Q={};
+function saveFail(e){var c=e&&e.code;toast(c==='quota_exceeded'?'Storage for this page is full. Delete an old night to free space.':c==='invalid_argument'?'That did not save. You may have view-only access.':'That did not save. Try again.');}
+function write(path,op){var p=(Q[path]||Promise.resolve()).then(op).catch(saveFail);Q[path]=p;return p;}
+function upd(path,data){return write(path,function(){return S.db.doc(path).update(data);});}
+
+/* ---------- tally ---------- */
+function tally(){
+  var T={};
+  function rec(id){return T[id]||(T[id]={done:0,up:0,ns:0,last:'',cats:{},tonight:[]});}
+  S.nights.forEach(function(n){
+    var a=n.assign||{};
+    (n.slots||[]).forEach(function(s){
+      var x=a[s.id];if(!x||!x.m)return;var r=rec(x.m);
+      if(n.closed){r.done++;r.cats[s.cat]=(r.cats[s.cat]||0)+1;if(n.date>r.last)r.last=n.date;}else{r.up++;}
+      if(n.id===S.nightId)r.tonight.push(slotLabel(s));
+    });
+    var ns=n.ns||{};Object.keys(ns).forEach(function(k){var v=ns[k];if(v&&v.m)rec(v.m).ns++;});
+  });
+  return T;
+}
+function order(T){
+  return S.members.filter(function(m){return !m.skip;}).sort(function(a,b){
+    var x=T[a.id]||Z,y=T[b.id]||Z;
+    return (x.done+x.up)-(y.done+y.up)||(x.last<y.last?-1:x.last>y.last?1:0)||a.name.localeCompare(b.name);
+  });
+}
+
+/* ---------- render ---------- */
+var pending=0;
+function schedule(){if(pending)return;pending=setTimeout(function(){pending=0;renderAll();},0);}
+function gate(el,what){
+  if(S.phase==='nodb'){el.innerHTML='<p class="empty">Couldn\'t reach '+what+'. Check your connection and reload.</p>';return true;}
+  if(S.phase==='loading'||!(S.cfgLoaded&&S.membersLoaded&&S.nightsLoaded)){el.innerHTML='<p class="empty">Loading '+what+'.</p>';return true;}
+  return false;
+}
+function renderAll(){
+  var ready=S.phase==='ready'&&S.cfgLoaded&&S.membersLoaded&&S.nightsLoaded;
+  $('#access-chip').hidden=S.canWrite||!ready;
+  TABS.forEach(function(t){$('#view-'+t).hidden=t!==S.tab;var a=$('.tabs a[data-tab="'+t+'"]');if(t===S.tab)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
+  renderNightBar(ready);
+  if(S.tab==='guests')renderGuests();
+  else if(S.tab==='list')renderList();
+  else if(S.tab==='lineup')renderLineup();
+  else if(S.tab==='checklist')renderChecklist();
+  else if(S.tab==='door')renderDoor();
+  else if(S.tab==='tally')renderTally();
+  else renderRoster();
+  if(S.pickSlot)renderPicker();
+}
+function renderNightBar(ready){
+  var sel=$('#night-select'),sig=S.phase+'|'+ready+'|'+S.nightId+'|'+S.nights.map(function(n){return n.id+(n.closed?'c':'o')+n.date;}).join(',');
+  if(sig!==S.selSig){
+    S.selSig=sig;
+    if(!ready){sel.innerHTML='<option value="">'+(S.phase==='nodb'?'Not available':'Loading')+'</option>';sel.disabled=true;}
+    else if(!S.nights.length){sel.innerHTML='<option value="">No nights yet</option>';sel.disabled=true;}
+    else{sel.innerHTML=S.nights.map(function(n){return '<option value="'+esc(n.id)+'">'+esc(fmtDate(n.date))+(n.closed?' (closed out)':'')+'</option>';}).join('');sel.disabled=false;sel.value=S.nightId||'';}
+  }
+  var can=ready&&S.canWrite;
+  $('#new-night-btn').hidden=!can||!S.nights.length;
+  $('#new-night-btn').setAttribute('aria-expanded',String(S.showNew));
+  var form=$('#new-night-form'),show=can&&(S.showNew||!S.nights.length);
+  if(show&&form.hidden&&!$('#new-night-date').value)$('#new-night-date').value=todayStr();
+  form.hidden=!show;
+}
+
+function renderLineup(){
+  var el=$('#lineup-body'),form=$('#slot-form');
+  form.hidden=true;
+  if(gate(el,'the lineup: every role by clock time, who is on it, and what is still open'))return;
+  var n=night();
+  if(!n){el.innerHTML='<p class="empty">'+(S.cfg&&S.cfg.slots?'No late nights yet. '+(S.canWrite?'Pick the date above and start one. It gets the full role list, the checklist and the door rules.':'The social chair has not started one.'):'The role list has not been set up yet.')+'</p>';return;}
+  var slots=n.slots||[],a=n.assign||{},T=tally(),gs=groups(n);
+  var filled=slots.filter(function(s){return a[s.id]&&a[s.id].m;}).length,open=slots.length-filled;
+  var canEdit=S.canWrite&&!n.closed;
+  if(!canEdit)S.editSlots=false;
+  var h='<div class="summary"><p class="count"><strong>'+filled+'</strong> of '+slots.length+' roles filled'+(open?'<span class="open-n">'+open+' open</span>':'')+'</p><div class="pips" aria-hidden="true">';
+  gs.forEach(function(g){g.slots.forEach(function(s){h+='<span class="pip'+(a[s.id]&&a[s.id].m?'':' open')+'"></span>';});});
+  h+='</div></div>';
+  if(n.closed)h+='<p class="banner ok">Closed out. These roles count as done on the tally.'+(S.canWrite?' <button class="btn small" type="button" data-act="reopen">Reopen</button>':'')+'</p>';
+  if(S.confirm==='close')h+='<p class="banner warn">'+open+(open===1?' role is':' roles are')+' still open. Close out anyway? <button class="btn small" type="button" data-act="confirm-close">Close out</button><button class="btn small" type="button" data-act="cancel-confirm">Cancel</button></p>';
+  if(S.confirm==='delete')h+='<p class="banner bad">Delete '+esc(fmtDate(n.date))+' and everything recorded for it? <button class="btn small danger" type="button" data-act="confirm-delete">Delete night</button><button class="btn small" type="button" data-act="cancel-confirm">Cancel</button></p>';
+  h+='<div class="actions">';
+  if(canEdit){
+    h+='<button class="btn primary" type="button" data-act="autofill"'+(open?'':' disabled')+'>Auto-fill open roles</button>';
+    h+='<button class="btn" type="button" data-act="copy-open"'+(open?'':' disabled')+'>Copy open roles</button>';
+  }
+  h+='<button class="btn" type="button" data-act="copy-lineup">Copy lineup</button>';
+  if(canEdit){
+    h+='<button class="btn" type="button" data-act="edit-slots" aria-pressed="'+S.editSlots+'">'+(S.editSlots?'Done editing':'Edit roles')+'</button>';
+    h+='<button class="btn" type="button" data-act="close-night">Close out night</button>';
+  }
+  h+='</div><ol class="blocks">';
+  gs.forEach(function(g){
+    h+='<li class="block"><div class="clock'+(isClock(g.t)?'':' word')+'">'+esc(g.t)+'</div><ul class="slots">';
+    g.slots.forEach(function(s){
+      var x=a[s.id],has=!!(x&&x.m),tn=has?(T[x.m]||Z).tonight.length:0;
+      var label=has?esc(nameOf(x.m))+(tn>1?'<span class="dbl">'+tn+' roles tonight</span>':''):'Open';
+      h+='<li class="slot'+(S.editSlots?' editing':'')+'"><div class="what"><span class="role">'+esc(s.role)+'</span>'+seatTag(s)+(s.note?'<span class="note">'+esc(s.note)+'</span>':'')+'</div>';
+      h+=canEdit?'<button class="who'+(has?'':' open')+'" type="button" data-act="pick" data-slot="'+esc(s.id)+'">'+label+'</button>':'<span class="who'+(has?'':' open')+'">'+label+'</span>';
+      if(S.editSlots)h+='<button class="btn small danger" type="button" data-act="rm-slot" data-slot="'+esc(s.id)+'" aria-label="Remove '+esc(slotLabel(s))+'">Remove</button>';
+      h+='</li>';
+    });
+    h+='</ul></li>';
+  });
+  h+='</ol>';
+  var ns=n.ns||{},nk=Object.keys(ns).filter(function(k){return ns[k]&&ns[k].m;});
+  if(nk.length){
+    h+='<div class="noshows"><h3>No-shows this night</h3><ul>';
+    nk.forEach(function(k){h+='<li><span><strong>'+esc(nameOf(ns[k].m))+'</strong>, '+esc(ns[k].what||'role')+'</span>'+(S.canWrite?'<button class="btn small" type="button" data-act="undo-ns" data-key="'+esc(k)+'">Remove</button>':'')+'</li>';});
+    h+='</ul></div>';
+  }
+  el.innerHTML=h;
+  form.hidden=!(S.editSlots&&canEdit);
+}
+
+function renderChecklist(){
+  var el=$('#checklist-body'),form=$('#item-form');
+  form.hidden=true;
+  if(gate(el,'the checklist: supplies, pre-event setup and during-event setup'))return;
+  var c=S.cfg||{},n=night(),checks=(n&&n.checks)||{},can=S.canWrite&&n&&!n.closed;
+  var total=0,done=0,body='';
+  SECTIONS.forEach(function(sec){
+    var items=c[sec[0]]||[],d=0;
+    var list=items.map(function(it){
+      var on=!!checks[it.id];if(on)d++;
+      return '<li><label class="check" for="ck-'+esc(it.id)+'"><input type="checkbox" id="ck-'+esc(it.id)+'" data-item="'+esc(it.id)+'"'+(on?' checked':'')+(can?'':' disabled')+'><span class="cbody"><span class="ctext">'+esc(it.text)+'</span>'+(it.detail?'<span class="cdetail">'+esc(it.detail)+'</span>':'')+'</span></label>'+(S.editList&&S.canWrite?'<button class="btn small danger" type="button" data-act="rm-item" data-sec="'+sec[0]+'" data-item="'+esc(it.id)+'" aria-label="Remove '+esc(it.text)+'">Remove</button>':'')+'</li>';
+    }).join('');
+    total+=items.length;done+=d;
+    body+='<div class="clist"><div class="clist-head"><h3>'+sec[1]+'</h3><span class="n">'+d+' of '+items.length+'</span></div><ul>'+(list||'<li class="hint">Nothing here yet.</li>')+'</ul></div>';
+  });
+  var h='<div class="summary"><p class="count"><strong>'+done+'</strong> of '+total+' done'+(n?' for '+esc(fmtDate(n.date)):'')+'</p></div>';
+  if(!n)h+='<p class="hint">Start a late night to tick things off. Each night keeps its own ticks.</p>';
+  else if(n.closed)h+='<p class="hint">This night is closed out, so the ticks are locked.</p>';
+  if(S.canWrite)h+='<div class="actions"><button class="btn" type="button" data-act="edit-list" aria-pressed="'+S.editList+'">'+(S.editList?'Done editing':'Edit checklist')+'</button></div>';
+  el.innerHTML=h+body;
+  form.hidden=!(S.editList&&S.canWrite);
+}
+
+function renderDoor(){
+  var el=$('#door-body');
+  if(gate(el,'the door rules for each shift'))return;
+  var d=(S.cfg&&S.cfg.door)||[],n=night(),a=(n&&n.assign)||{};
+  if(!d.length){el.innerHTML='<p class="empty">No door rules have been added yet.</p>';return;}
+  el.innerHTML=d.map(function(r){
+    var on='';
+    if(n){
+      var ss=(n.slots||[]).filter(function(s){return s.cat==='Door'&&s.t===r.t;});
+      if(ss.length){
+        var names=ss.map(function(s){var x=a[s.id];return x&&x.m?'<strong>'+esc(nameOf(x.m))+'</strong>'+(s.seat==='social'?' (social)':''):'open';});
+        on='<p class="on-door">On this door '+esc(fmtDate(n.date))+': '+names.join(', ')+'</p>';
+      }
+    }
+    return '<article class="door"><div class="clock">'+esc(r.t)+'</div><div class="door-body"><p class="door-title">'+esc(r.title)+'</p>'+on+'<ul class="rules">'+(r.rules||[]).map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ul></div></article>';
+  }).join('');
+}
+
+function renderTally(){
+  var el=$('#tally-body');
+  if(gate(el,'the tally: roles done per brother and who is up next'))return;
+  if(!S.members.length){el.innerHTML='<p class="empty">No names yet. Add the brothers on the Roster tab. Counts build up here each time you close out a night.</p>';return;}
+  var T=tally(),ord=order(T),skipped=S.members.filter(function(m){return m.skip;}),cats=CATS.slice();
+  Object.keys(T).forEach(function(id){if(T[id].cats.Other&&cats.indexOf('Other')<0)cats.push('Other');});
+  function num(v,cls){return '<td class="'+(v?(cls||''):'z')+'">'+v+'</td>';}
+  function row(m,sk){
+    var r=T[m.id]||Z;
+    return '<tr'+(sk?' class="skipped"':'')+'><td>'+esc(m.name)+(sk?' (skipped)':'')+'</td>'+num(r.done,'strong')+num(r.up)+cats.map(function(c){return num(r.cats[c]||0);}).join('')+num(r.ns,'nsd')+'<td'+(r.last?'':' class="z"')+'>'+(r.last?esc(fmtDate(r.last)):'never')+'</td></tr>';
+  }
+  var h='<h2>Up next</h2><p class="hint">Fewest roles first, then whoever has gone longest without one. Auto-fill picks in this order.</p><ol class="upnext">';
+  ord.slice(0,8).forEach(function(m){var r=T[m.id]||Z,l=r.done+r.up;h+='<li><span>'+esc(m.name)+'</span><span class="un-n">'+l+(l===1?' role':' roles')+'</span></li>';});
+  h+='</ol><h2>Everyone</h2><p class="hint">A role counts as done once its night is closed out. Roles on nights still open show as booked.</p>';
+  h+='<div class="table-wrap"><table><thead><tr><th>Name</th><th>Done</th><th>Booked</th>'+cats.map(function(c){return '<th>'+esc(c==='Clean up'?'Clean':c)+'</th>';}).join('')+'<th>No-shows</th><th>Last</th></tr></thead><tbody>';
+  h+=ord.map(function(m){return row(m,false);}).join('')+skipped.map(function(m){return row(m,true);}).join('');
+  el.innerHTML=h+'</tbody></table></div>';
+}
+
+function renderRoster(){
+  var el=$('#roster-body'),ready=S.phase==='ready'&&S.membersLoaded;
+  $('#roster-form').hidden=!(ready&&S.canWrite);
+  if(gate(el,'the roster: every brother, who is on the social team, and who to skip'))return;
+  var ae=document.activeElement;
+  if(ae&&ae.tagName==='INPUT'&&el.contains(ae)){S.rosterDirty=true;return;}
+  S.rosterDirty=false;
+  if(!S.members.length){el.innerHTML='<p class="empty">No names yet. '+(S.canWrite?'Paste the house roster above, one name per line. Then mark who is on the social team so the door seats fill correctly.':'The social chair has not added the roster.')+'</p>';return;}
+  var soc=S.members.filter(function(m){return m.social;}).length,sk=S.members.filter(function(m){return m.skip;}).length;
+  var h='<p class="hint">'+S.members.length+(S.members.length===1?' name':' names')+', '+soc+' on the social team'+(sk?', '+sk+' skipped':'')+'. Skip takes someone out of auto-fill and the picker without losing their history.</p><ul class="members">';
+  S.members.forEach(function(m){
+    var id=esc(m.id);
+    h+='<li class="member"><input class="mname" type="text" id="mn-'+id+'" data-member="'+id+'" value="'+esc(m.name)+'" aria-label="Name"'+(S.canWrite?'':' readonly')+'>';
+    if(S.canWrite){
+      h+='<button class="btn small" type="button" data-act="toggle-social" data-member="'+id+'" aria-pressed="'+!!m.social+'">Social team</button>';
+      h+='<button class="btn small" type="button" data-act="toggle-skip" data-member="'+id+'" aria-pressed="'+!!m.skip+'">Skip</button>';
+      h+=S.confirmRm===m.id?'<button class="btn small danger" type="button" data-act="confirm-rm" data-member="'+id+'">Confirm remove</button><button class="btn small" type="button" data-act="cancel-rm">Keep</button>':'<button class="btn small danger" type="button" data-act="rm-member" data-member="'+id+'">Remove</button>';
+    }else{
+      h+=(m.social?'<span class="tag social">Social team</span>':'')+(m.skip?'<span class="tag">Skipped</span>':'');
+    }
+    h+='</li>';
+  });
+  el.innerHTML=h+'</ul>';
+}
+
+function renderPicker(){
+  var n=night(),s=null;
+  if(n)(n.slots||[]).forEach(function(x){if(x.id===S.pickSlot)s=x;});
+  if(!s||n.closed){closeDlg($('#picker'));return;}
+  $('#picker-title').textContent=slotLabel(s)+(s.seat==='social'?', social team seat':s.seat==='brother'?', brother seat':'');
+  var cur=(n.assign||{})[s.id],curId=cur&&cur.m;
+  $('#picker-current').innerHTML=curId?'<div class="current"><p>On now: <strong>'+esc(nameOf(curId))+'</strong></p><div class="row"><button class="btn small" type="button" data-act="noshow">No-show, reopen the role</button><button class="btn small" type="button" data-act="clear-slot">Clear the role</button></div></div>':'';
+  var q=$('#picker-search').value.trim().toLowerCase(),T=tally();
+  var list=order(T).filter(function(m){return !q||m.name.toLowerCase().indexOf(q)>=0;});
+  function row(m){
+    var r=T[m.id]||Z,bits=[r.done+' done'];
+    if(r.up)bits.push(r.up+' booked');
+    bits.push(r.last?'last '+fmtDate(r.last):'never worked');
+    var also=r.tonight.filter(function(l){return !(m.id===curId&&l===slotLabel(s));});
+    return '<li><button class="person" type="button" data-act="assign" data-member="'+esc(m.id)+'"'+(m.id===curId?' disabled':'')+'><span class="pname">'+esc(m.name)+(m.social?'<span class="tag social">Social team</span>':'')+'</span><span class="pmeta">'+esc(bits.join(' · '))+(also.length&&m.id!==curId?' · <span class="also">already on '+esc(also.join(', '))+'</span>':'')+'</span></button></li>';
+  }
+  var h='';
+  if(!S.members.length)h='<li class="hint">No names yet. Add the brothers on the Roster tab.</li>';
+  else if(!list.length)h='<li class="hint">Nobody matches that search.</li>';
+  else if(s.seat==='social'){
+    var a=list.filter(function(m){return m.social;}),b=list.filter(function(m){return !m.social;});
+    h=(a.length?a.map(row).join(''):'<li class="hint">Nobody on the social team matches. Mark the social team on the Roster tab.</li>')+(b.length?'<li class="div"><h3>Not on the social team</h3></li>'+b.map(row).join(''):'');
+  }else h=list.map(row).join('');
+  $('#picker-list').innerHTML=h;
+}
+
+/* ---------- guests ---------- */
+function norm(x){return String(x||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').trim();}
+function slug(x){return norm(x).replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,50)||'x';}
+function listOf(g){return Array.isArray(g&&g.list)?g.list:[];}
+function guestsFor(nid){
+  nid=nid||'none';
+  var out=[];
+  Object.keys(S.guests).forEach(function(mid){
+    if(!S.mById[mid])return;
+    listOf(S.guests[mid]).forEach(function(nm){out.push({name:nm,uid:mid,member:mid,by:nameOf(mid),key:(nid+'__'+mid+'__'+slug(nm)).slice(0,190)});});
+  });
+  return out.sort(function(a,b){return a.name.localeCompare(b.name);});
+}
+function renderGuests(){
+  var el=$('#guests-body'),form=$('#guest-form');
+  form.hidden=true;
+  if(gate(el,'the guest list'))return;
+  if(!S.guestsLoaded){el.innerHTML='<p class="empty">Loading the guest list.</p>';return;}
+  if(!S.members.length){el.innerHTML='<p class="empty">The roster has not been added yet.</p>';return;}
+  el.innerHTML='';
+  form.hidden=false;
+  var sel=$('#g-member');
+  var osig=S.members.map(function(m){return m.id+m.name;}).join('|');
+  if(osig!==S.optSig){
+    S.optSig=osig;var cur=sel.value||store('lnb-me')||'';
+    sel.innerHTML='<option value="">Select your name</option>'+S.members.filter(function(m){return !m.skip;}).map(function(m){return '<option value="'+esc(m.id)+'">'+esc(m.name)+'</option>';}).join('');
+    sel.value=S.mById[cur]?cur:'';
+  }
+  var mid=sel.value,fsig=mid+'|'+JSON.stringify(listOf(S.guests[mid]));
+  var typing=document.activeElement&&/^g-\d$/.test(document.activeElement.id);
+  if(fsig!==S.formSig&&!(typing&&S.formMid===mid)){
+    S.formSig=fsig;S.formMid=mid;
+    var list=listOf(S.guests[mid]);
+    for(var i=0;i<MAXG;i++)$('#g-'+i).value=list[i]||'';
+  }
+  for(var j=0;j<MAXG;j++)$('#g-'+j).disabled=!mid;
+  $('#g-claim').hidden=true;
+  $('#g-save').disabled=!mid;
+}
+function hl(text,q){
+  if(!q)return esc(text);
+  var i=norm(text).indexOf(q);
+  if(i<0||norm(text).length!==text.length)return esc(text);
+  return esc(text.slice(0,i))+'<mark>'+esc(text.slice(i,i+q.length))+'</mark>'+esc(text.slice(i+q.length));
+}
+function guestRow(g,q,closed){
+  var on=!!S.checkins[g.key];
+  return '<div class="guest'+(on?' in':'')+'"><div style="min-width:0"><div class="gname">'+hl(g.name,q)+'</div><div class="gvia">Invited by '+esc(g.by)+'</div></div><div class="gacts">'+
+    '<button class="chk" type="button" data-act="checkin" data-key="'+esc(g.key)+'" data-name="'+esc(g.name)+'" data-by="'+esc(g.by)+'" aria-pressed="'+on+'"'+(closed?' disabled':'')+'>'+(on?'✓ In':'Check in')+'</button>'+
+    (S.isOwner?'<button class="gx" type="button" data-act="rm-guest" data-uid="'+esc(g.uid)+'" data-name="'+esc(g.name)+'" aria-label="Remove '+esc(g.name)+'">×</button>':'')+
+    '</div></div>';
+}
+function renderList(){
+  var el=$('#list-body'),bar=$('#gl-bar');
+  bar.hidden=true;
+  if(gate(el,'the guest list'))return;
+  if(!S.guestsLoaded||!S.checkinsLoaded){el.innerHTML='<p class="empty">Loading the guest list.</p>';return;}
+  var n=night();
+  bar.hidden=false;
+  var closed=!n||n.closed;
+  var all=guestsFor(n&&n.id),q=norm($('#gl-q').value),by=$('#gl-by').value;
+  var names=[];all.forEach(function(g){if(names.indexOf(g.by)<0)names.push(g.by);});names.sort();
+  var bsel=$('#gl-by'),bsig=names.join('|');
+  if(bsel.dataset.sig!==bsig){bsel.dataset.sig=bsig;bsel.innerHTML='<option value="">All brothers</option>'+names.map(function(x){return '<option value="'+esc(x)+'">'+esc(x)+'</option>';}).join('');bsel.value=names.indexOf(by)>=0?by:'';by=bsel.value;}
+  var inN=all.filter(function(g){return S.checkins[g.key];}).length;
+  $('#gl-count').innerHTML='<b>'+all.length+'</b> on the list · <b>'+inN+'</b> checked in';
+  if(!all.length){el.innerHTML='<p class="empty">No guests yet. Brothers add theirs on the My guests tab.</p>';return;}
+  var rows=all.filter(function(g){return (!by||g.by===by)&&(!q||norm(g.name).indexOf(q)>=0||norm(g.by).indexOf(q)>=0);});
+  if(!rows.length){el.innerHTML='<p class="empty">'+(q?'Nobody named \u201c'+esc($('#gl-q').value.trim())+'\u201d is on the list.':'No guests for this brother.')+'</p>';return;}
+  var h=(n?'':'<p class="hint">Start a late night at the top to check people in. Check-ins reset each night; the guest list stays.</p>')+(n&&!S.isOwner?'<p class="hint">Working door? <button class="btn small" type="button" data-act="unlock-door">Enter door PIN</button> to check people in.</p>':'')+'<div class="glist">';
+  if(q){rows.forEach(function(g){h+=guestRow(g,q,!n);});}
+  else{
+    var grp={};rows.forEach(function(g){(grp[g.by]=grp[g.by]||[]).push(g);});
+    Object.keys(grp).sort().forEach(function(b){
+      var gs=grp[b];
+      h+='<div class="ghead"><span>'+esc(b)+'</span><span>'+gs.filter(function(g){return S.checkins[g.key];}).length+'/'+gs.length+' in</span></div>';
+      gs.forEach(function(g){h+=guestRow(g,'',!n);});
+    });
+  }
+  el.innerHTML=h+'</div>';
+}
+
+/* ---------- message text ---------- */
+function openText(n){
+  var a=n.assign||{},lines=[];
+  groups(n).forEach(function(g){
+    var by={},ord=[];
+    g.slots.forEach(function(s){if(a[s.id]&&a[s.id].m)return;if(!by[s.role]){by[s.role]={any:0,brother:0,social:0};ord.push(s.role);}by[s.role][s.seat==='social'?'social':s.seat==='brother'?'brother':'any']++;});
+    ord.forEach(function(r){var c=by[r],parts=[];if(c.brother)parts.push(c.brother+(c.brother===1?' brother':' brothers'));if(c.social)parts.push(c.social+' social team');if(c.any)parts.push(c.any+(parts.length?' more':' open'));lines.push((isClock(g.t)?g.t+' ':'')+r+': '+parts.join(', '));});
+  });
+  return 'Late night '+fmtDate(n.date)+', roles still open:\n'+lines.join('\n')+'\nReply with the one you want.';
+}
+function lineupText(n){
+  var a=n.assign||{},lines=[];
+  groups(n).forEach(function(g){
+    var by={},ord=[];
+    g.slots.forEach(function(s){if(!by[s.role]){by[s.role]=[];ord.push(s.role);}var x=a[s.id];by[s.role].push(x&&x.m?nameOf(x.m)+(s.seat==='social'?' (social)':''):'OPEN');});
+    ord.forEach(function(r){lines.push((isClock(g.t)?g.t+' ':'')+r+': '+by[r].join(', '));});
+  });
+  return 'Late night '+fmtDate(n.date)+' lineup\n'+lines.join('\n');
+}
+function copy(text,what){
+  function fallback(){$('#copy-text').value=text;openDlg($('#copy-dialog'));$('#copy-text').focus();$('#copy-text').select();}
+  try{navigator.clipboard.writeText(text).then(function(){toast(what+' copied. Paste it in the group chat.');},fallback);}catch(e){fallback();}
+}
+
+/* ---------- actions ---------- */
+function setAssign(slot,m){var o={};o[slot]=m?{m:m}:null;return upd(nightPath(),{assign:o});}
+function autofill(){
+  var n=night();if(!n||n.closed)return;
+  var a=n.assign||{},T=tally(),load={},last={},busy={},rnd={};
+  S.members.forEach(function(m){var r=T[m.id]||Z;load[m.id]=r.done+r.up;last[m.id]=r.last;busy[m.id]=r.tonight.length>0;rnd[m.id]=Math.random();});
+  var open=(n.slots||[]).filter(function(s){return !(a[s.id]&&a[s.id].m);});
+  open=open.filter(function(s){return s.seat==='social';}).concat(open.filter(function(s){return s.seat!=='social';}));
+  var pool=S.members.filter(function(m){return !m.skip;}),picks={},count=0,left=0;
+  open.forEach(function(s){
+    var c=pool.filter(function(m){return !busy[m.id]&&(s.seat!=='social'||m.social);});
+    if(!c.length){left++;return;}
+    c.sort(function(p,q){return load[p.id]-load[q.id]||(last[p.id]<last[q.id]?-1:last[p.id]>last[q.id]?1:0)||rnd[p.id]-rnd[q.id];});
+    picks[s.id]={m:c[0].id};busy[c[0].id]=true;load[c[0].id]++;count++;
+  });
+  if(!count){toast(S.members.length?'Nobody is free for the open roles. Everyone active already has one tonight.':'Add the brothers on the Roster tab first.');return;}
+  S.lastFill={night:n.id,ids:Object.keys(picks)};
+  upd(nightPath(),{assign:picks});
+  toast('Filled '+count+(count===1?' role':' roles')+(left?'. '+left+' still open, nobody free for '+(left===1?'it':'them'):''),{act:'undo-fill',label:'Undo'});
+}
+
+var ACT={
+  'new-night-toggle':function(){S.showNew=!S.showNew;},
+  'pick':function(b){S.pickSlot=b.dataset.slot;$('#picker-search').value='';renderPicker();openDlg($('#picker'));},
+  'close-picker':function(){closeDlg($('#picker'));},
+  'close-copy':function(){closeDlg($('#copy-dialog'));},
+  'assign':function(b){var slot=S.pickSlot;closeDlg($('#picker'));if(slot)setAssign(slot,b.dataset.member);},
+  'clear-slot':function(){var slot=S.pickSlot;closeDlg($('#picker'));if(slot)setAssign(slot,null);},
+  'noshow':function(){
+    var n=night(),slot=S.pickSlot,s=null;closeDlg($('#picker'));if(!n||!slot)return;
+    (n.slots||[]).forEach(function(x){if(x.id===slot)s=x;});
+    var cur=(n.assign||{})[slot];if(!s||!cur||!cur.m)return;
+    var as={},ns={};as[slot]=null;ns[slot+'_'+cur.m]={m:cur.m,what:slotLabel(s)};
+    upd(nightPath(),{assign:as,ns:ns});
+    toast(nameOf(cur.m)+' logged as a no-show. The role is open again.');
+  },
+  'undo-ns':function(b){var ns={};ns[b.dataset.key]=null;upd(nightPath(),{ns:ns});},
+  'autofill':autofill,
+  'undo-fill':function(){
+    var f=S.lastFill;$('#toast').hidden=true;if(!f||f.night!==S.nightId)return;
+    var o={};f.ids.forEach(function(id){o[id]=null;});S.lastFill=null;upd(nightPath(),{assign:o});
+  },
+  'copy-open':function(){var n=night();if(n)copy(openText(n),'Open roles');},
+  'copy-lineup':function(){var n=night();if(n)copy(lineupText(n),'Lineup');},
+  'edit-slots':function(){S.editSlots=!S.editSlots;S.confirm=null;},
+  'close-night':function(){
+    var n=night();if(!n)return;var a=n.assign||{};
+    var open=(n.slots||[]).some(function(s){return !(a[s.id]&&a[s.id].m);});
+    if(open){S.confirm='close';}else{upd(nightPath(),{closed:true});toast('Closed out. These roles now count as done.');}
+  },
+  'confirm-close':function(){S.confirm=null;S.editSlots=false;upd(nightPath(),{closed:true});toast('Closed out. The filled roles now count as done.');},
+  'cancel-confirm':function(){S.confirm=null;},
+  'reopen':function(){upd(nightPath(),{closed:false});},
+  'rm-slot':function(b){
+    var n=night();if(!n)return;var id=b.dataset.slot,as={};as[id]=null;
+    upd(nightPath(),{slots:clone(n.slots||[]).filter(function(s){return s.id!==id;}),assign:as});
+  },
+  'save-default':function(){var n=night();if(!n)return;upd('config/bible',{slots:clone(n.slots||[])});toast('New nights will start from this role list.');},
+  'delete-night':function(){S.confirm='delete';},
+  'confirm-delete':function(){
+    var path=nightPath();S.confirm=null;S.editSlots=false;
+    write(path,function(){return S.db.doc(path).delete();});toast('Night deleted.');
+  },
+  'edit-list':function(){S.editList=!S.editList;},
+  'rm-item':function(b){
+    var sec=b.dataset.sec,id=b.dataset.item,o={};
+    o[sec]=clone((S.cfg&&S.cfg[sec])||[]).filter(function(i){return i.id!==id;});upd('config/bible',o);
+  },
+  'toggle-social':function(b){var m=S.mById[b.dataset.member];if(!m)return;var o={};o[m.id]={social:!m.social};upd('roster/main',{m:o});},
+  'toggle-skip':function(b){var m=S.mById[b.dataset.member];if(!m)return;var o={};o[m.id]={skip:!m.skip};upd('roster/main',{m:o});},
+  'rm-member':function(b){
+    var id=b.dataset.member,used=S.nights.some(function(n){
+      var a=n.assign||{},ns=n.ns||{};
+      return Object.keys(a).some(function(k){return a[k]&&a[k].m===id;})||Object.keys(ns).some(function(k){return ns[k]&&ns[k].m===id;});
+    });
+    if(used)toast(nameOf(id)+' has roles on record. Use Skip so the history stays intact.');else S.confirmRm=id;
+  },
+  'confirm-rm':function(b){var o={};o[b.dataset.member]=null;S.confirmRm=null;upd('roster/main',{m:o});},
+  'cancel-rm':function(){S.confirmRm=null;},
+  'unlock-door':function(){if(window.elmoUnlockDoor)window.elmoUnlockDoor();},
+  'checkin':function(b){
+    if(!S.isOwner){if(window.elmoUnlockDoor)window.elmoUnlockDoor();return;}
+    var k=b.dataset.key,path='checkins/'+k;
+    if(S.checkins[k])write(path,function(){return S.db.doc(path).delete();});
+    else write(path,function(){return S.db.doc(path).set({night:S.nightId,name:b.dataset.name,by:b.dataset.by,at:new Date().toISOString()});});
+  },
+  'rm-guest':function(b){
+    var uid=b.dataset.uid,g=S.guests[uid];if(!g)return;
+    upd('guests/'+uid,{list:listOf(g).filter(function(x){return x!==b.dataset.name;})});
+  }
+};
+
+document.addEventListener('click',function(e){
+  var t=e.target.closest('[data-tab]');
+  if(t){e.preventDefault();setTab(t.dataset.tab,true);return;}
+  var b=e.target.closest('[data-act]');
+  if(!b||b.disabled)return;
+  var fn=ACT[b.dataset.act];
+  if(fn){fn(b);schedule();}
+});
+document.addEventListener('change',function(e){
+  var t=e.target;
+  if(t.id==='g-member'){store('lnb-me',t.value);S.formSig=null;$('#g-status').textContent='';schedule();return;}
+  if(t.id==='gl-by'){renderList();return;}
+  if(t.id==='night-select'){S.nightId=t.value;store('lnb-night',t.value);S.confirm=null;S.editSlots=false;S.selSig=null;schedule();return;}
+  if(t.matches&&t.matches('input[data-item]')){var o={};o[t.dataset.item]=t.checked;upd(nightPath(),{checks:o});return;}
+  if(t.classList&&t.classList.contains('mname')){
+    var m=S.mById[t.dataset.member],v=t.value.trim();
+    if(!m)return;
+    if(!v){t.value=m.name;return;}
+    if(v!==m.name){var r={};r[m.id]={name:v};upd('roster/main',{m:r});}
+  }
+});
+document.addEventListener('focusout',function(){if(S.rosterDirty)setTimeout(schedule,0);});
+$('#picker-search').addEventListener('input',renderPicker);
+$('#gl-q').addEventListener('input',renderList);
+$('#guest-form').addEventListener('submit',function(e){
+  e.preventDefault();
+  var st=$('#g-status'),mid=$('#g-member').value;
+  if(!S.db)return;
+  if(!mid){st.className='status bad';st.textContent='Pick your name first.';return;}
+  var seen={},list=[];
+  for(var i=0;i<MAXG;i++){var v=$('#g-'+i).value.replace(/\s+/g,' ').trim();if(v&&!seen[norm(v)]){seen[norm(v)]=1;list.push(v);}}
+  var path='guests/'+mid;
+  st.className='status';st.textContent='Saving';
+  write(path,function(){
+    return S.db.doc(path).set({list:list,at:new Date().toISOString()}).then(function(){
+      st.className='status ok';st.textContent=list.length?'Saved. '+list.length+(list.length===1?' guest':' guests')+' on the list.':'Saved. Your list is empty.';
+    });
+  });
+});
+
+/* ---------- tabs ---------- */
+function setTab(t,push){
+  if(TABS.indexOf(t)<0)t='list';
+  S.tab=t;store('lnb-tab',t);
+  if(push){try{history.replaceState(null,'','#'+t);}catch(e){}}
+  schedule();
+}
+window.addEventListener('hashchange',function(){var h=location.hash.slice(1);if(TABS.indexOf(h)>=0)setTab(h,false);});
+
+/* ---------- boot ---------- */
+function pickNight(){
+  if(night())return;
+  var open=S.nights.filter(function(n){return !n.closed;});
+  var pick=open.length?open[open.length-1]:S.nights[0];
+  S.nightId=pick?pick.id:null;
+}
+function subFail(){S.phase='nodb';schedule();}
+function boot(){
+  var h=location.hash.slice(1);
+  S.tab=TABS.indexOf(h)>=0?h:(TABS.indexOf(store('lnb-tab'))>=0?store('lnb-tab'):'list');
+  renderAll();
+  var use=window.claude&&window.claude.use?function(n){return window.claude.use(n);}:null;
+  if(!use){S.phase='nodb';renderAll();return;}
+  use('user').then(function(u){
+    if(!u)return;
+    u.id().then(function(id){S.myId=id;schedule();}).catch(function(){});
+    u.isOwner().then(function(o){S.isOwner=!!o;schedule();}).catch(function(){});
+    window.addEventListener('elmo-door',function(){S.isOwner=true;schedule();});
+    return u.can('data.write').then(function(c){if(c===false){S.canWrite=false;schedule();}});
+  }).catch(function(){});
+  use('db').then(function(db){
+    if(!db){S.phase='nodb';renderAll();return;}
+    S.db=db;S.phase='ready';
+    db.doc('config/bible').onSnapshot(function(s){S.cfg=s.exists?s.data():null;S.cfgLoaded=true;schedule();},subFail);
+    db.doc('roster/main').onSnapshot(function(s){
+      var m=(s.exists&&s.data().m)||{};
+      S.rosterExists=s.exists;
+      S.members=Object.keys(m).filter(function(k){return m[k]&&m[k].name;}).map(function(k){return {id:k,name:String(m[k].name),social:!!m[k].social,skip:!!m[k].skip};}).sort(function(a,b){return a.name.localeCompare(b.name);});
+      S.mById={};S.members.forEach(function(x){S.mById[x.id]=x;});
+      S.membersLoaded=true;schedule();
+    },subFail);
+    db.collection('nights').limit(400).onSnapshot(function(q){
+      S.nights=q.docs.map(function(d){var v=d.data()||{};return {id:d.id,date:v.date||d.id,closed:!!v.closed,slots:v.slots||[],assign:v.assign||{},ns:v.ns||{},checks:v.checks||{}};}).sort(function(a,b){return a.date<b.date?1:a.date>b.date?-1:0;});
+      S.nightsLoaded=true;pickNight();schedule();
+    },subFail);
+    db.collection('guests').limit(400).onSnapshot(function(q){
+      var g={};q.docs.forEach(function(d){g[d.id]=d.data()||{};});S.guests=g;S.guestsLoaded=true;schedule();
+    },subFail);
+    db.collection('checkins').limit(1000).onSnapshot(function(q){
+      var c={};q.docs.forEach(function(d){c[d.id]=d.data()||{};});S.checkins=c;S.checkinsLoaded=true;schedule();
+    },subFail);
+    schedule();
+  }).catch(function(){S.phase='nodb';renderAll();});
+}
+boot();
+})();
+</script>
+<script>
+/* Portfolio demo: an in-memory stand-in for Firebase. Every name and item here is made up,
+   nothing is sent anywhere, and everything resets when the page reloads. */
+(function () {
+  const clone = (v) => (v == null ? v : JSON.parse(JSON.stringify(v)));
+  const isObj = (v) => v && typeof v === "object" && !Array.isArray(v);
+  function merge(a, b) {
+    const out = isObj(a) ? clone(a) : {};
+    Object.keys(b).forEach((k) => { out[k] = isObj(b[k]) && isObj(out[k]) ? merge(out[k], b[k]) : clone(b[k]); });
+    return out;
+  }
+  const store = new Map();               // path -> data
+  const docL = new Map(), colL = new Map();
+  const parent = (p) => p.slice(0, p.lastIndexOf("/"));
+  const snapDoc = (p) => ({ id: p.split("/").pop(), exists: store.has(p), data: () => clone(store.get(p)), metadata: { fromCache: false, hasPendingWrites: false } });
+  function snapCol(c, n) {
+    const docs = [...store.keys()].filter((k) => parent(k) === c).slice(0, n || 1e9).map(snapDoc);
+    return { docs, size: docs.length, empty: !docs.length, metadata: { fromCache: false } };
+  }
+  function emit(p) {
+    (docL.get(p) || []).forEach((f) => f(snapDoc(p)));
+    (colL.get(parent(p)) || []).forEach((o) => o.f(snapCol(parent(p), o.n)));
+  }
+  const later = (fn) => Promise.resolve().then(fn);
+  function docRef(path) {
+    return {
+      id: path.split("/").pop(), path,
+      get: () => later(() => snapDoc(path)),
+      set: (d) => later(() => { store.set(path, clone(d)); emit(path); }),
+      update: (d) => later(() => { store.set(path, merge(store.get(path), d)); emit(path); }),
+      delete: () => later(() => { store.delete(path); emit(path); }),
+      onSnapshot: (next) => { const a = docL.get(path) || []; a.push(next); docL.set(path, a); later(() => next(snapDoc(path))); return () => {}; }
+    };
+  }
+  function coll(path, n) {
+    return {
+      path, limit: (k) => coll(path, k), doc: (id) => docRef(path + "/" + id),
+      onSnapshot: (next) => { const a = colL.get(path) || []; a.push({ f: next, n }); colL.set(path, a); later(() => next(snapCol(path, n))); return () => {}; }
+    };
+  }
+  const db = { doc: docRef, collection: coll };
+
+  /* ---- made-up data ---- */
+  const NAMES = ["Alex","Bea","Cam","Dev","Eli","Fran","Gus","Hana","Ines","Jules","Kofi","Lena","Max","Nico","Ola","Priya","Quinn","Rafa","Sam","Tess"];
+  const SOCIAL = new Set(["Priya","Sam","Lena"]);
+  const roster = { m: {} }, id = (n) => "demo_" + n.toLowerCase();
+  NAMES.forEach((n) => { roster.m[id(n)] = { name: n, social: SOCIAL.has(n), skip: false }; });
+  const T = (t) => t;
+  const slots = [
+    ["s01","Setup","Pre-event setup","any","Before",""],["s02","Setup","Pre-event setup","any","Before",""],
+    ["s03","Door","Door","any","1:20","The pre, until 1:50"],["s04","Setup","Event setup","any","1:50",""],
+    ["s05","Door","Door","brother","1:50","Until 2:30"],["s06","Door","Door","social","1:50",""],
+    ["s07","Stairs","Stairs","any","2:00",""],["s08","Snacks","Snack table","any","2:00",""],
+    ["s09","DJ","DJ","any","2:00",""],["s10","Door","Door","brother","2:30","Door closes at 3:00"],
+    ["s11","Door","Door","social","2:30",""],["s12","Stairs","Stairs","any","3:00",""],
+    ["s13","DJ","DJ","any","3:00",""],["s14","Clean up","Clean up","any","After",""],["s15","Clean up","Clean up","any","After",""]
+  ].map(([sid, cat, role, seat, t, note]) => ({ id: sid, cat, role, seat, t, note }));
+  const config = {
+    slots,
+    door: [
+      { id: "r1", t: "1:20", title: "Run the pre", rules: ["Only friends of the house for now.", "A brother comes to the door to bring each guest in."] },
+      { id: "r2", t: "1:50", title: "Open the line", rules: ["Start the line at the bottom of the stairs.", "Check names against the guest list.", "When it's full, run it one out, one in."] },
+      { id: "r3", t: "2:30", title: "Wind it down", rules: ["Door closes at 3:00.", "Tell the next shift who's already inside."] }
+    ],
+    pre: [
+      { id: "p1", text: "Move tables", detail: "" }, { id: "p2", text: "Move chairs", detail: "" },
+      { id: "p3", text: "Set up the speaker", detail: "Plug into the kitchen outlet" }, { id: "p4", text: "Move bikes inside", detail: "" }
+    ],
+    during: [
+      { id: "d1", text: "Block off stairs", detail: "" }, { id: "d2", text: "Line barrier out front", detail: "" },
+      { id: "d3", text: "Lights", detail: "" }, { id: "d4", text: "Music", detail: "" }
+    ],
+    supplies: [
+      { id: "u1", text: "Cups", detail: "3 bags" }, { id: "u2", text: "Water", detail: "4 gallons" },
+      { id: "u3", text: "Snacks", detail: "Chips and pretzels" }, { id: "u4", text: "Ice", detail: "2 bags" }
+    ]
+  };
+  const ymd = (d) => d.toISOString().slice(0, 10);
+  const today = new Date(), last = new Date(Date.now() - 7 * 864e5), prev = new Date(Date.now() - 14 * 864e5);
+  function fill(order) { const a = {}; slots.forEach((s, i) => { if (order[i]) a[s.id] = { m: id(order[i]) }; }); return a; }
+  store.set("config/bible", config);
+  store.set("roster/main", roster);
+  store.set("nights/" + ymd(prev), { date: ymd(prev), closed: true, slots, assign: fill(["Gus","Hana","Ines","Jules","Kofi","Priya","Max","Nico","Ola","Quinn","Lena","Rafa","Tess","Bea","Cam"]), ns: {}, checks: {} });
+  store.set("nights/" + ymd(last), { date: ymd(last), closed: true, slots, assign: fill(["Alex","Bea","Cam","Dev","Eli","Sam","Fran","Gus","Hana","Ines","Priya","Jules","Kofi","Lena","Max"]), ns: { s07_demo_fran: { m: id("Fran"), what: "Stairs 2:00" } }, checks: {} });
+  store.set("nights/" + ymd(today), { date: ymd(today), closed: false, slots, assign: fill(["Nico","Ola","Quinn","Rafa","Tess","Lena","Alex","Dev","Eli","Bea",null,"Cam","Fran",null,"Max"]), ns: {}, checks: { p1: true, p2: true } });
+  const G = {
+    Alex: ["Maya Brooks","Owen Hart"], Bea: ["Chloe Park","Leo Fischer","Ruby Chen"], Dev: ["Kira Patel"],
+    Eli: ["Theo Silva","Isla Novak"], Nico: ["Ava Martinez","Ben Okafor"], Priya: ["Grace Liu","Henry Adams","Noah Kim"],
+    Sam: ["Ella Brooks"], Tess: ["Felix Wang","Olivia Grant"]
+  };
+  Object.keys(G).forEach((n) => store.set("guests/" + id(n), { list: G[n], at: today.toISOString() }));
+  const slug = (s) => String(s).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  [["Alex","Maya Brooks"],["Bea","Chloe Park"],["Priya","Grace Liu"]].forEach(([b, g]) => {
+    const k = (ymd(today) + "__" + id(b) + "__" + slug(g)).slice(0, 190);
+    store.set("checkins/" + k, { night: ymd(today), name: g, by: id(b), at: today.toISOString() });
+  });
+
+  const P = (v) => Promise.resolve(v);
+  document.getElementById("gate").hidden = true;
+  window.elmoUnlockDoor = () => window.dispatchEvent(new Event("elmo-door"));
+  window.__elmoResolve({ db, user: { id: () => P(id("Alex")), isOwner: () => P(true), canEdit: () => P(true), can: () => P(true) } });
+})();
+</script>
+
+</body>
+</html>
