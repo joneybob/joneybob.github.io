@@ -10,22 +10,26 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="site.webmanifest">
-<meta name="theme-color" content="#111214">
+<meta name="theme-color" content="#0C0D10">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#F6F5F1; --ink:#111214; --muted:#6B6E75; --rule:#D9D7D0; --card:#EEEDE7; --inv-bg:#111214; --inv-ink:#F6F5F1;
-  --serif:"Cormorant Garamond",Garamond,Georgia,serif;
-  --sans:"Inter Tight",system-ui,-apple-system,sans-serif;
-  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  --bg:#FFFFFF; --ink:#0C0D10; --muted:#6B6F76; --rule:#E6E6E8; --card:#F5F5F5; --card2:#E8E8E8; --inv-bg:#0C0D10; --inv-ink:#FFFFFF;
+  --dem:#2F5FC4; --gop:#C22F1C; --dem-tint:rgba(47,95,196,.12); --gop-tint:rgba(194,47,28,.10);
+  --serif:"Space Grotesk",system-ui,-apple-system,sans-serif;
+  --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",system-ui,sans-serif;
+  --thin:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",system-ui,sans-serif;
+  --mono:"Spline Sans Mono",ui-monospace,Menlo,monospace;
   --w:1120px;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#0B0D10; --ink:#F2F4F7; --muted:#8B93A3; --rule:#232830; --card:#14171C; --inv-bg:#F2F4F7; --inv-ink:#0B0D10;
+  --bg:#000000; --ink:#F2F2F3; --muted:#A0A0A6; --rule:#232326; --card:#1A1A1A; --card2:#2D2D2D; --inv-bg:#F2F2F3; --inv-ink:#000000;
+  --dem:#7D9BF0; --gop:#E5715F; --dem-tint:rgba(125,155,240,.18); --gop-tint:rgba(229,113,95,.16);
 }}
-:root[data-theme="dark"]{--bg:#0B0D10; --ink:#F2F4F7; --muted:#8B93A3; --rule:#232830; --card:#14171C; --inv-bg:#F2F4F7; --inv-ink:#0B0D10;}
+:root[data-theme="dark"]{--bg:#000000; --ink:#F2F2F3; --muted:#A0A0A6; --rule:#232326; --card:#1A1A1A; --card2:#2D2D2D; --inv-bg:#F2F2F3; --inv-ink:#000000;
+  --dem:#7D9BF0; --gop:#E5715F; --dem-tint:rgba(125,155,240,.18); --gop-tint:rgba(229,113,95,.16);}
 
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -280,6 +284,63 @@ footer{padding:28px 0;font:400 12px var(--mono);color:var(--muted)}
 .panel{border:1px solid var(--rule)}
 #work .sec-head{margin-bottom:8px}
 
+
+/* ===== Bellwether × Focs system ===== */
+body{font-family:var(--sans);font-size:17px;letter-spacing:-.005em}
+.mark{font:700 20px/1 var(--serif);letter-spacing:-.04em}
+nav ul a{font:500 14px var(--sans)}
+#theme{background:var(--card);border:0;width:34px;height:34px}
+.eyebrow{font:500 11px/1.4 var(--mono);letter-spacing:.12em}
+.eyebrow .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--gop);margin-right:10px;vertical-align:1px}
+h1{font:700 clamp(56px,9vw,112px)/.92 var(--serif);letter-spacing:-.045em;margin:20px 0 26px}
+.lede{font:400 clamp(19px,2vw,23px)/1.5 var(--serif);letter-spacing:-.01em}
+.lede u{text-decoration:none;border-bottom:2.5px solid var(--dem);padding-bottom:1px}
+.lede u.r{border-color:var(--gop)}
+.lede mark{background:var(--dem-tint);color:inherit;border-radius:8px;padding:1px 7px;font-weight:600}
+.tally{border-top:1px solid var(--rule)}
+.tally b{font:200 clamp(38px,4.6vw,58px)/1 var(--thin);letter-spacing:-.03em}
+.tally span{font-size:13px}
+h2{font:600 clamp(34px,4.6vw,52px)/1 var(--serif);letter-spacing:-.035em}
+.sec-head .eyebrow{font-size:11px}
+.index{border-top:1px solid var(--rule)}
+.index b{font:500 21px/1 var(--serif);letter-spacing:-.02em}
+.index span{font-family:var(--mono);font-size:11px}
+.index a:hover b{color:var(--gop)}
+.project{border-top:1px solid var(--rule)}
+.project:first-of-type{border-top:1px solid var(--rule)}
+.project h3{font:600 clamp(32px,3.8vw,44px)/1.02 var(--serif);letter-spacing:-.035em}
+.role{font:500 11px/1.5 var(--mono);letter-spacing:.1em}
+.num{font:500 12px var(--mono)}
+.panel{background:var(--card);border:0;border-radius:16px}
+.panel dt{font:200 clamp(32px,3.4vw,42px)/1 var(--thin);letter-spacing:-.03em}
+.panel h4{font-family:var(--mono)}
+.tags span{font:500 11.5px var(--mono);border:0;background:var(--card);border-radius:8px;padding:5px 9px;color:var(--ink)}
+.links a{font:600 14px var(--sans);border-bottom:2px solid var(--dem)}
+.links a:hover{opacity:1;border-color:var(--gop);color:var(--gop)}
+.solid{border-radius:12px}
+.bw-launch{border-radius:10px}
+.browser{border:0;background:var(--card);border-radius:16px}
+.browser .bar{border-bottom:1px solid var(--rule)}
+.art{border:0;background:var(--card);border-radius:16px}
+.art.soon{background:transparent;border:1.5px dashed var(--card2)}
+.articles h5{font:600 22px/1.15 var(--serif);letter-spacing:-.02em}
+.articles .date{font-family:var(--mono);font-size:11px}
+.gallery .shot{border:0;border-radius:16px;background:var(--card)}
+.gallery .shot:hover{border-color:transparent;box-shadow:0 0 0 2px var(--dem)}
+.gallery.tall .shot{border-radius:20px}
+.gallery figcaption{font:400 11.5px/1.45 var(--mono)}
+.gal-note a{border-bottom:2px solid var(--dem);text-decoration:none}
+.device video,.device-live .screen{border-color:#0C0D10}
+.device figcaption,.device-live figcaption{font-family:var(--mono)}
+.facts{border-top:1px solid var(--rule)}
+.facts span{font-family:var(--mono);font-size:11px}
+.about p{font-size:16.5px}
+.contact{background:var(--inv-bg);color:var(--inv-ink)}
+.contact h2{font:700 clamp(44px,7vw,84px)/1 var(--serif);letter-spacing:-.045em}
+.contact .links a{border-color:var(--inv-ink);color:var(--inv-ink)}
+.contact .links a:hover{border-color:var(--gop);color:var(--gop)}
+footer{font-family:var(--mono)}
+
 /* motion */
 .reveal{opacity:0;transform:translateY(14px);transition:opacity .7s ease,transform .7s ease}
 .reveal.in{opacity:1;transform:none}
@@ -302,11 +363,11 @@ footer{padding:28px 0;font:400 12px var(--mono);color:var(--muted)}
 
 <header class="hero" id="top">
   <div class="wrap">
-    <div class="eyebrow">Mathematical Economics · University of Pennsylvania</div>
+    <div class="eyebrow"><i class="dot"></i>Jonathan Schwartz · Mathematical Economics · University of Pennsylvania</div>
     <div class="hero-grid">
       <div>
-        <h1>Jonathan<br><em>Schwartz</em></h1>
-        <p class="lede">I take a messy pile of information, work out what matters and make a call under uncertainty. Right now that means election data as a <strong>Data Science &amp; Project Fellow at VoteHub</strong>, energy markets at Penn, and apps I build to fix my own problems.</p>
+        <h1>Jonathan<br>Schwartz</h1>
+        <p class="lede">I take a messy pile of information, <u class="b">work out what matters</u> and <u class="r">make a call under uncertainty</u>. Right now that means election data as a <mark>Data Science &amp; Project Fellow at VoteHub</mark>, energy markets at Penn, and apps I build to fix my own problems.</p>
       </div>
       <nav class="index" aria-label="Projects">
         <div class="eyebrow">Index</div>
