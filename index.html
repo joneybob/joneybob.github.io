@@ -81,12 +81,15 @@ h2{font:500 clamp(36px,5vw,56px)/1 var(--serif);margin:0;letter-spacing:-.01em}
 @media (max-width:860px){.project{grid-template-columns:1fr;gap:18px} .num{padding:0}}
 
 /* writing (votehub articles) */
-.articles{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:8px;border-top:1px solid var(--rule);grid-column:2 / -1}
-.articles article{padding:22px 22px 0 0}
+.articles{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:8px;grid-column:2 / -1}
+.art{display:block;text-decoration:none;border:1px solid var(--rule);border-radius:14px;padding:18px 20px;transition:border-color .2s,transform .2s}
+a.art:not(.soon):hover{border-color:var(--ink);transform:translateY(-2px)}
+.art.soon{cursor:default;pointer-events:none}
+.art.soon .date{opacity:.8}
 .articles .date{font:400 12px var(--mono);color:var(--muted)}
 .articles h5{font:500 24px/1.12 var(--serif);margin:8px 0 8px}
 .articles p{font-size:14px;color:var(--muted);margin:0}
-@media (max-width:860px){.articles{grid-template-columns:1fr;grid-column:auto} .articles article{padding:20px 0;border-bottom:1px solid var(--rule)}}
+@media (max-width:860px){.articles{grid-template-columns:1fr;grid-column:auto}}
 
 /* also */
 .also{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
@@ -126,7 +129,7 @@ footer{padding:28px 0;font:400 12px var(--mono);color:var(--muted)}
 .fx,.fm{display:grid;grid-template-columns:minmax(0,340px) 1fr;gap:32px;align-items:center}
 .fx-side p{margin:0 0 12px;font-size:15px;max-width:30em}
 .check{display:flex;gap:8px;align-items:center;font-size:14px;color:var(--muted);cursor:pointer}
-@media (max-width:860px){.demo{grid-column:auto;padding:16px} .fx,.fm{grid-template-columns:1fr;gap:20px}}
+@media (max-width:860px){.browser{grid-column:auto} .demo{grid-column:auto;padding:16px} .fx,.fm{grid-template-columns:1fr;gap:20px}}
 
 /* bellwether */
 .bw-score{margin-bottom:18px}
@@ -202,6 +205,19 @@ footer{padding:28px 0;font:400 12px var(--mono);color:var(--muted)}
 .el-row.in em{background:#fff;color:#000;border-color:#fff}
 .el-empty{color:#8B93A3;font-size:14px;text-align:center;margin:20px 0}
 
+
+/* device videos */
+.device{margin:0;align-self:start;justify-self:center;width:min(300px,100%)}
+.device video{display:block;width:100%;aspect-ratio:420/860;object-fit:cover;object-position:top;border-radius:36px;border:8px solid var(--ink);background:var(--card);box-shadow:0 30px 60px -30px rgba(0,0,0,.35)}
+.device figcaption{font:400 12px/1.5 var(--mono);color:var(--muted);text-align:center;margin-top:12px}
+.shot video,.shot img{display:block;width:100%;border-radius:12px;border:1px solid var(--rule)}
+.browser{grid-column:2 / -1;border:1px solid var(--rule);border-radius:14px;overflow:hidden;background:var(--card)}
+.browser .bar{display:flex;align-items:center;gap:6px;padding:10px 14px;border-bottom:1px solid var(--rule);font:400 12px var(--mono);color:var(--muted)}
+.browser .bar i{width:10px;height:10px;border-radius:50%;background:var(--rule);display:inline-block}
+.browser .bar span{margin-left:10px}
+.browser video{display:block;width:100%}
+@media (max-width:860px){.browser{grid-column:auto}}
+
 /* motion */
 .reveal{opacity:0;transform:translateY(14px);transition:opacity .7s ease,transform .7s ease}
 .reveal.in{opacity:1;transform:none}
@@ -230,7 +246,7 @@ footer{padding:28px 0;font:400 12px var(--mono);color:var(--muted)}
     <div class="tally">
       <div><b>177,021</b><span>precincts in the national data set I built</span></div>
       <div><b>7,190</b><span>campaign appearances tracked across 23 races</span></div>
-      <div><b>4</b><span>apps built for iPhone, iPad and Mac</span></div>
+      <div><b>3</b><span>apps across iPhone, iPad, Mac and the web</span></div>
       <div><b>2028</b><span>graduating class at Penn</span></div>
     </div>
   </div>
@@ -246,20 +262,21 @@ footer{padding:28px 0;font:400 12px var(--mono);color:var(--muted)}
       <div>
         <h3>Bellwether</h3>
         <p class="role">Election atlas &amp; forecast · Solo · 2026</p>
-        <p>A county-level map of American elections that lets anyone pull up past results, compare places and simulate their own outcome. I built the data pipeline, the model and the interface.</p>
+        <p>An atlas of every certified election return in American history, down to the county and precinct. Anyone can pull up past results, compare places and simulate their own outcome. I built the data pipeline, the model and the interface.</p>
         <p>Every result is collected from state and county sources, cleaned and joined to Census and polling data, then shipped as one fast web app with a full methodology paper behind it.</p>
         <div class="tags"><span>Python</span><span>JavaScript</span><span>GeoJSON</span><span>Census data</span></div>
         <div class="links"><a href="https://bellwetherelections.com" target="_blank" rel="noopener">bellwetherelections.com ↗</a></div>
       </div>
       <div class="panel">
-        <h4>What's inside</h4>
-        <ul>
-          <li>County results map<small>presidential · Senate · governor</small></li>
-          <li>House districts<small>by redistricting era</small></li>
-          <li>Precinct layers<small>2024</small></li>
-          <li>Custom election simulator<small>click to pick</small></li>
-          <li>Methodology paper<small>PDF</small></li>
-        </ul>
+        <dl>
+          <dt>236 years</dt><dd>of certified election returns</dd>
+          <dt>3,144</dt><dd>counties, plus 167,775+ precincts</dd>
+          <dt>10</dt><dd>workspaces: explore, simulate, draw districts, demographics and more</dd>
+        </dl>
+      </div>
+      <div class="browser">
+        <div class="bar"><i></i><i></i><i></i><span>bellwetherelections.com</span></div>
+        <video src="media/bellwether.mp4" poster="media/bellwether.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Recording of Bellwether: county results for 2024, the 2020 to 2024 swing, then 2008 and 1960"></video>
       </div>
       <div class="demo" id="demo-bellwether">
         <div class="demo-head"><span class="try">Try it</span><span>Swing the country, or click a state to flip it</span></div>
@@ -285,7 +302,7 @@ footer{padding:28px 0;font:400 12px var(--mono);color:var(--muted)}
         <h3>VoteHub</h3>
         <p class="role">Product/Data Science Fellow · 2026</p>
         <p>VoteHub is an election data and media startup. I write data features for the site, build the data sets behind them and make internal tools for election night.</p>
-        <p>First, I built a national precinct data set covering 100% of the 2020 map. Next, I used it for articles on AI political ads, Trump's approval and the campus vote. Lastly, I built a race-calling console for election night.</p>
+        <p>First, I built a national precinct data set covering 100% of the 2020 map. Next, I used it for articles on data centers, AI political ads, Trump's approval and the campus vote. Lastly, I built a race-calling console for election night.</p>
         <div class="tags"><span>Python</span><span>Datawrapper</span><span>JavaScript</span></div>
       </div>
       <div class="panel">
@@ -295,28 +312,35 @@ footer{padding:28px 0;font:400 12px var(--mono);color:var(--muted)}
           <dt>125</dt><dd>college campuses in 28 states measured for the 2026 campus swing</dd>
         </dl>
       </div>
+      <!-- Articles: when one is published, put its votehub.com URL in href, remove "soon", and change the date line. -->
       <div class="articles">
-        <article>
-          <div class="date">Sep 23, 2026</div>
+        <a class="art" href="https://votehub.com/2026/10/28/the-data-center-midterm/" target="_blank" rel="noopener">
+          <div class="date">Oct 28, 2026 · Read on VoteHub ↗</div>
+          <h5>The Data Center Midterm</h5>
+          <p>Voters hate data centers, and campaigns are catching on. But the buildout sits in a handful of states, so only a few races are directly exposed.</p>
+        </a>
+        <a class="art soon">
+          <div class="date">Coming soon</div>
           <h5>Are Campaigns Disclosing Their AI Ads?</h5>
           <p>31 states require a label on AI-manipulated political ads. Most of the money behind them doesn't carry one.</p>
-        </article>
-        <article>
-          <div class="date">Oct 9, 2026</div>
+        </a>
+        <a class="art soon">
+          <div class="date">Coming soon</div>
           <h5>Where Is Trump Underwater?</h5>
           <p>Approval modeled in every state and House district from poll crosstabs. Underwater in 157 of the 234 districts he carried.</p>
-        </article>
-        <article>
-          <div class="date">Forthcoming</div>
+        </a>
+        <a class="art soon">
+          <div class="date">Coming soon</div>
           <h5>Did College Campuses Swing Harder?</h5>
           <p>Campus precincts moved about four points further toward Democrats than their states in 2026.</p>
-        </article>
+        </a>
       </div>
       <div class="demo" id="demo-votehub">
         <div class="demo-head"><span class="try">Try it</span><span>Who campaigned where in the final two months</span></div>
         <div class="seg"><button data-v="people">Surrogates</button><button data-v="states">States</button><button data-v="party">Parties</button></div>
         <div class="vh-chart"></div>
         <p class="demo-note vh-note"></p>
+        <div class="links"><a href="https://votehub.com/2026-campaign-tracker/" target="_blank" rel="noopener">Explore the live 2026 Campaign Tracker ↗</a></div>
       </div>
     </article>
 
@@ -330,17 +354,10 @@ footer{padding:28px 0;font:400 12px var(--mono);color:var(--muted)}
         <p>Focs runs Pomodoro and Flowtime sessions, blocks apps with Screen Time, plans the day around your classes and syncs to a Mac app with end-to-end encryption. Friends can see each other's focus time.</p>
         <div class="tags"><span>Swift</span><span>SwiftUI</span><span>CloudKit</span><span>Screen Time API</span><span>WidgetKit</span></div>
       </div>
-      <div class="panel">
-        <h4>Built in</h4>
-        <ul>
-          <li>App blocking<small>Screen Time</small></li>
-          <li>Class-aware day planner<small>schedule</small></li>
-          <li>Stats &amp; streaks<small>insights</small></li>
-          <li>Friends &amp; encrypted sync<small>CloudKit</small></li>
-          <li>Widgets, Live Activities, Siri<small>iOS 26</small></li>
-          <li>Mac companion app<small>macOS</small></li>
-        </ul>
-      </div>
+      <figure class="device">
+        <video src="media/focs.mp4" poster="media/focs.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Recorded in the iPhone simulator: Today plan, focus timer, calendar, tasks"></video>
+        <figcaption>Recorded in the iPhone simulator: Today plan, focus timer, calendar, tasks</figcaption>
+      </figure>
       <div class="demo" id="demo-focs">
         <div class="demo-head"><span class="try">Try it</span><span>The Focs timer, running in your browser</span></div>
         <div class="fx">
@@ -372,13 +389,10 @@ footer{padding:28px 0;font:400 12px var(--mono);color:var(--muted)}
         <p>Everything runs on the device, with no account and nothing uploaded. The App Store listing, privacy label and review notes are written and ready.</p>
         <div class="tags"><span>Swift</span><span>SwiftUI</span><span>Core Image</span><span>StoreKit</span></div>
       </div>
-      <div class="panel">
-        <dl>
-          <dt>3 · 6 · 9</dt><dd>post layouts from a single photo</dd>
-          <dt>0</dt><dd>uploads or accounts needed</dd>
-          <dt>iPhone + iPad</dt><dd>layouts for both</dd>
-        </dl>
-      </div>
+      <figure class="device">
+        <video src="media/frmat.mp4" poster="media/frmat.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Recorded in the iPhone simulator: splitting a panorama into 6 posts"></video>
+        <figcaption>Recorded in the iPhone simulator: splitting a panorama into 6 posts</figcaption>
+      </figure>
       <div class="demo" id="demo-frmat">
         <div class="demo-head"><span class="try">Try it</span><span>Split one photo into a seamless grid</span></div>
         <div class="fm">
@@ -433,17 +447,6 @@ footer{padding:28px 0;font:400 12px var(--mono);color:var(--muted)}
         </div>
       </div>
     </article>
-  </div>
-</section>
-
-<section>
-  <div class="wrap">
-    <div class="sec-head reveal"><h2>Also built</h2></div>
-    <div class="also reveal">
-      <div><b>lfting</b><p>A lifting tracker for iPhone with a 3D muscle map that shows what you've trained.</p></div>
-      <div><b>Looseleaf</b><p>A handwritten notes app for iPad with Apple Pencil, shape recognition and a lasso tool.</p></div>
-      <div><b>Coursework</b><p>Modern Data Mining at Penn: prediction and classification in Python.</p></div>
-    </div>
   </div>
 </section>
 
