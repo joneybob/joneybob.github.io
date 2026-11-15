@@ -110,6 +110,98 @@ h2{font:500 clamp(36px,5vw,56px)/1 var(--serif);margin:0;letter-spacing:-.01em}
 .contact .links{margin-top:36px;gap:28px}
 footer{padding:28px 0;font:400 12px var(--mono);color:var(--muted)}
 
+/* demos */
+.demo{grid-column:2 / -1;border:1px solid var(--rule);border-radius:18px;padding:24px;margin-top:4px}
+.demo-head{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:20px;font-size:14px;color:var(--muted)}
+.try{font:500 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;background:var(--ink);color:var(--bg);padding:5px 9px;border-radius:999px}
+.demo-note{font-size:12.5px;color:var(--muted);margin:14px 0 0}
+.demo button{font:inherit;cursor:pointer}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:999px;padding:3px;gap:2px;margin-bottom:18px}
+.seg button{border:0;background:none;color:var(--muted);font:500 13px var(--sans);padding:7px 14px;border-radius:999px}
+.seg button.on{background:var(--ink);color:var(--bg)}
+.solid{background:var(--ink);color:var(--bg);border:0;border-radius:999px;padding:10px 22px;font:600 14px var(--sans)}
+.ghost{background:none;color:var(--ink);border:1px solid var(--rule);border-radius:999px;padding:9px 18px;font:500 14px var(--sans);display:inline-block}
+.ghost:hover{border-color:var(--ink)}
+.phone{background:var(--card);border-radius:28px;padding:20px;border:1px solid var(--rule)}
+.fx,.fm{display:grid;grid-template-columns:minmax(0,340px) 1fr;gap:32px;align-items:center}
+.fx-side p{margin:0 0 12px;font-size:15px;max-width:30em}
+.check{display:flex;gap:8px;align-items:center;font-size:14px;color:var(--muted);cursor:pointer}
+@media (max-width:860px){.demo{grid-column:auto;padding:16px} .fx,.fm{grid-template-columns:1fr;gap:20px}}
+
+/* bellwether */
+.bw-score{margin-bottom:18px}
+.bw-nums{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;color:var(--muted)}
+.bw-nums b{font:500 34px/1 var(--serif);color:var(--ink);font-variant-numeric:lining-nums tabular-nums}
+.bw-verdict{font:500 13px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink)}
+.bw-bar{position:relative;display:flex;justify-content:space-between;height:10px;border-radius:999px;background:var(--rule);overflow:hidden;margin-top:10px}
+.bw-bar i{display:block;height:100%;transition:width .35s ease}
+.bw-bar-d{background:#3A5C96}.bw-bar-r{background:#AA3E3A}
+.bw-bar em{position:absolute;left:50%;top:-3px;bottom:-3px;width:2px;background:var(--ink)}
+.bw-grid{display:grid;grid-template-columns:repeat(11,1fr);grid-template-rows:repeat(8,auto);gap:4px}
+.bw-tile{aspect-ratio:1;border:0;border-radius:6px;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0;transition:background .3s,transform .15s;line-height:1.1}
+.bw-tile b{font:600 clamp(9px,1.4vw,14px) var(--sans)}
+.bw-tile small{font:400 clamp(7px,1vw,10px) var(--mono);opacity:.8}
+.bw-tile:hover{transform:scale(1.08)}
+.bw-tile.picked{box-shadow:inset 0 0 0 2px var(--bg),0 0 0 2px var(--ink)}
+.bw-controls{display:grid;grid-template-columns:1fr auto;gap:6px 16px;align-items:center;margin-top:18px}
+.bw-controls label{font-size:14px;grid-column:1 / -1}
+.bw-swing-val{font:500 13px var(--mono);color:var(--muted);margin-left:6px}
+.bw-swing{width:100%;accent-color:var(--ink)}
+.bw-scale{grid-column:1;display:flex;justify-content:space-between;font:400 11px var(--mono);color:var(--muted)}
+.bw-reset{grid-row:2 / 4;grid-column:2}
+
+/* votehub */
+.vh-row{display:grid;grid-template-columns:minmax(110px,190px) 1fr 40px;gap:12px;align-items:center;padding:7px 0;font-size:14px}
+.vh-track{height:20px}
+.vh-bar{display:flex;height:100%;border-radius:4px;overflow:hidden;transition:width .6s cubic-bezier(.2,.8,.2,1)}
+.vh-bar i{display:block;height:100%}
+.vh-d{background:#3A5C96}.vh-r{background:#AA3E3A}.vh-n{background:var(--ink);opacity:.75}
+.vh-val{font:500 15px var(--mono);text-align:right}
+@media (max-width:600px){.vh-row{grid-template-columns:96px 1fr 30px;font-size:12.5px;gap:8px}}
+
+/* focs */
+.phone .seg{display:flex;justify-content:center;margin:0 auto 10px;width:max-content}
+.fx-dial{position:relative;width:min(240px,100%);margin:6px auto 14px;aspect-ratio:1}
+.fx-dial svg{width:100%;height:100%}
+.fx-ring-bg{fill:none;stroke:var(--rule);stroke-width:8}
+.fx-ring-fg{fill:none;stroke:var(--ink);stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset .2s linear}
+.fx-read{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.fx-time{font:500 56px/1 var(--serif);font-variant-numeric:lining-nums tabular-nums}
+.fx-phase{font:500 11px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:8px}
+.fx-btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.fx-log{text-align:center;font:400 12px var(--mono);color:var(--muted);margin:14px 0 0}
+
+/* frmat */
+.fm-phone{padding:16px}
+.fm-profile{display:flex;gap:10px;align-items:center;margin-bottom:12px}
+.fm-profile i{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--muted),var(--rule))}
+.fm-profile b{display:block;font-size:14px}.fm-profile small{font-size:12px;color:var(--muted)}
+.fm-grid{display:grid;gap:2px}
+.fm-cell{position:relative;aspect-ratio:1;background:var(--rule);overflow:hidden}
+.fm-cell canvas{width:100%;height:100%;display:block}
+.fm-idx{position:absolute;top:5px;left:5px;font:500 10px var(--mono);background:rgba(0,0,0,.55);color:#fff;border-radius:999px;padding:2px 6px}
+.fm-old{background:repeating-linear-gradient(45deg,var(--rule) 0 6px,transparent 6px 12px);opacity:.6}
+.file{position:relative;overflow:hidden;cursor:pointer;margin:6px 0 0}
+.file input{position:absolute;inset:0;opacity:0;cursor:pointer}
+
+/* late night */
+.el-phone{background:#0B0D10;color:#F2F4F7;border-color:#232830}
+.el-top{display:flex;justify-content:space-between;align-items:baseline}
+.el-top b{font:600 24px var(--serif)}
+.el-count{font:400 12px var(--mono);color:#8B93A3}
+.el-bar{height:4px;background:#232830;border-radius:999px;margin:10px 0 12px;overflow:hidden}
+.el-bar i{display:block;height:100%;background:#fff;transition:width .3s}
+.el-q{width:100%;font:500 15px var(--sans);padding:11px 14px;border-radius:10px;border:1px solid #272C35;background:#14171C;color:#F2F4F7;margin-bottom:10px}
+.el-q:focus{outline:none;border-color:#fff}
+.el-list{max-height:280px;overflow:auto;display:flex;flex-direction:column;gap:6px}
+.el-row{display:flex;justify-content:space-between;align-items:center;text-align:left;background:#14171C;border:1px solid #232830;color:inherit;border-radius:10px;padding:10px 12px}
+.el-row b{display:block;font:500 14px var(--sans)}
+.el-row small{font-size:12px;color:#8B93A3}
+.el-row em{font:500 12px var(--mono);font-style:normal;border:1px solid #3A404B;border-radius:999px;padding:4px 10px;white-space:nowrap}
+.el-row.in{opacity:.55}
+.el-row.in em{background:#fff;color:#000;border-color:#fff}
+.el-empty{color:#8B93A3;font-size:14px;text-align:center;margin:20px 0}
+
 /* motion */
 .reveal{opacity:0;transform:translateY(14px);transition:opacity .7s ease,transform .7s ease}
 .reveal.in{opacity:1;transform:none}
@@ -169,6 +261,21 @@ footer{padding:28px 0;font:400 12px var(--mono);color:var(--muted)}
           <li>Methodology paper<small>PDF</small></li>
         </ul>
       </div>
+      <div class="demo" id="demo-bellwether">
+        <div class="demo-head"><span class="try">Try it</span><span>Swing the country, or click a state to flip it</span></div>
+        <div class="bw-score">
+          <div class="bw-nums"><span><b class="bw-d">0</b> Dem</span><strong class="bw-verdict"></strong><span>Rep <b class="bw-r">0</b></span></div>
+          <div class="bw-bar"><i class="bw-bar-d"></i><i class="bw-bar-r"></i><em></em></div>
+        </div>
+        <div class="bw-grid"></div>
+        <div class="bw-controls">
+          <label>Uniform swing <span class="bw-swing-val"></span></label>
+          <input class="bw-swing" type="range" min="-10" max="10" step="0.5" value="0" aria-label="National swing">
+          <div class="bw-scale"><span>R +10</span><span>2024</span><span>D +10</span></div>
+          <button class="ghost bw-reset">Reset</button>
+        </div>
+        <p class="demo-note">Approximate 2024 presidential margins. Maine and Nebraska districts are folded into their states. The full Bellwether app works county by county.</p>
+      </div>
     </article>
 
     <!-- 02 VoteHub -->
@@ -205,6 +312,12 @@ footer{padding:28px 0;font:400 12px var(--mono);color:var(--muted)}
           <p>Campus precincts moved about four points further toward Democrats than their states in 2026.</p>
         </article>
       </div>
+      <div class="demo" id="demo-votehub">
+        <div class="demo-head"><span class="try">Try it</span><span>Who campaigned where in the final two months</span></div>
+        <div class="seg"><button data-v="people">Surrogates</button><button data-v="states">States</button><button data-v="party">Parties</button></div>
+        <div class="vh-chart"></div>
+        <p class="demo-note vh-note"></p>
+      </div>
     </article>
 
     <!-- 03 Focs -->
@@ -228,6 +341,25 @@ footer{padding:28px 0;font:400 12px var(--mono);color:var(--muted)}
           <li>Mac companion app<small>macOS</small></li>
         </ul>
       </div>
+      <div class="demo" id="demo-focs">
+        <div class="demo-head"><span class="try">Try it</span><span>The Focs timer, running in your browser</span></div>
+        <div class="fx">
+          <div class="phone">
+            <div class="seg"><button data-v="pomodoro">Pomodoro</button><button data-v="flow">Flowtime</button></div>
+            <div class="fx-dial">
+              <svg viewBox="0 0 200 200" aria-hidden="true"><circle cx="100" cy="100" r="88" class="fx-ring-bg"/><circle cx="100" cy="100" r="88" class="fx-ring-fg" transform="rotate(-90 100 100)"/></svg>
+              <div class="fx-read"><span class="fx-time">25:00</span><span class="fx-phase">Focus</span></div>
+            </div>
+            <div class="fx-btns"><button class="solid fx-go">Start</button><button class="ghost fx-end" hidden>End &amp; break</button><button class="ghost fx-reset">Reset</button></div>
+            <p class="fx-log"></p>
+          </div>
+          <div class="fx-side">
+            <p><b>Pomodoro</b> runs 25 minutes of focus, then a 5-minute break.</p>
+            <p><b>Flowtime</b> counts up until you stop. Your break is a fifth of the time you focused, so a long session earns a longer rest.</p>
+            <label class="check"><input type="checkbox" class="fx-fast" checked> Demo speed (1 second = 1 minute)</label>
+          </div>
+        </div>
+      </div>
     </article>
 
     <!-- 04 frmat -->
@@ -246,6 +378,21 @@ footer{padding:28px 0;font:400 12px var(--mono);color:var(--muted)}
           <dt>0</dt><dd>uploads or accounts needed</dd>
           <dt>iPhone + iPad</dt><dd>layouts for both</dd>
         </dl>
+      </div>
+      <div class="demo" id="demo-frmat">
+        <div class="demo-head"><span class="try">Try it</span><span>Split one photo into a seamless grid</span></div>
+        <div class="fm">
+          <div class="phone fm-phone">
+            <div class="fm-profile"><i></i><span><b>yourname</b><small>Preview of your profile grid</small></span></div>
+            <div class="fm-grid"></div>
+          </div>
+          <div class="fx-side">
+            <div class="seg"><button data-v="3">3 posts</button><button data-v="6">6 posts</button><button data-v="9">9 posts</button></div>
+            <p>Each tile is one post. The numbers show the order to post them in, so the picture lines up once they're all up.</p>
+            <label class="ghost file">Use your own photo<input type="file" accept="image/*" class="fm-file"></label>
+            <p class="demo-note">Your photo never leaves your browser, same as the app.</p>
+          </div>
+        </div>
       </div>
     </article>
 
@@ -268,6 +415,22 @@ footer{padding:28px 0;font:400 12px var(--mono);color:var(--muted)}
           <li>Setup checklist<small>social team</small></li>
           <li>No-show tracking<small>history</small></li>
         </ul>
+      </div>
+      <div class="demo" id="demo-elmo">
+        <div class="demo-head"><span class="try">Try it</span><span>You're working the door. Search a name and check them in.</span></div>
+        <div class="fm">
+          <div class="phone el-phone">
+            <div class="el-top"><b>Late Night</b><span class="el-count"></span></div>
+            <div class="el-bar"><i></i></div>
+            <input class="el-q" type="search" placeholder="Search a guest or brother" aria-label="Search guest name">
+            <div class="el-list"></div>
+          </div>
+          <div class="fx-side">
+            <p>Every brother adds his guests ahead of time. At the door, one search finds the guest and who invited them, and one tap checks them in.</p>
+            <p>Anyone who never shows up gets logged, so the social team knows who to remind next time.</p>
+            <p class="demo-note">Names here are made up for the demo.</p>
+          </div>
+        </div>
       </div>
     </article>
   </div>
@@ -333,5 +496,6 @@ footer{padding:28px 0;font:400 12px var(--mono);color:var(--muted)}
   els.forEach(function(e){io.observe(e)});
 })();
 </script>
+<script src="demos.js"></script>
 </body>
 </html>
