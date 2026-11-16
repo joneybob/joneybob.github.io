@@ -341,6 +341,10 @@ h2{font:600 clamp(34px,4.6vw,52px)/1 var(--serif);letter-spacing:-.035em}
 .contact .links a:hover{border-color:var(--gop);color:var(--gop)}
 footer{font-family:var(--mono)}
 
+.glance .facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:48px;border-top:0}
+.glance .facts div{border-top:1px solid var(--rule);border-bottom:0}
+@media (max-width:760px){.glance .facts{grid-template-columns:1fr}}
+.bw-launch,.bw-open{white-space:nowrap;flex-shrink:0}
 /* motion */
 .reveal{opacity:0;transform:translateY(14px);transition:opacity .7s ease,transform .7s ease}
 .reveal.in{opacity:1;transform:none}
@@ -354,6 +358,7 @@ footer{font-family:var(--mono)}
     <a class="mark" href="#top">JS</a>
     <ul>
       <li><a href="#work">Work</a></li>
+      <li class="hide-sm"><a href="#about">About</a></li>
       <li><a href="#contact">Contact</a></li>
       <li><button id="theme" aria-label="Toggle dark mode">◐</button></li>
     </ul>
@@ -531,6 +536,23 @@ footer{font-family:var(--mono)}
         <figcaption>Tap around.</figcaption>
       </figure>
     </article>
+  </div>
+</section>
+
+<section id="about">
+  <div class="wrap glance">
+    <div class="sec-head reveal"><h2>At a glance</h2></div>
+    <div class="facts reveal">
+      <div><span>School</span>University of Pennsylvania, Class of 2028</div>
+      <div><span>Major</span>Mathematical Economics</div>
+      <div><span>Minors</span>Statistics &amp; Data Science · Political Science</div>
+      <div><span>Now</span>VoteHub · Wharton Undergraduate Energy Group</div>
+      <div><span>Summer '26</span>PORES, Penn</div>
+      <div><span>Summer '25</span>Lindamood-Bell, literacy clinician</div>
+      <div><span>Summer '23</span>Lawrence Berkeley National Lab</div>
+      <div><span>Skills</span>Python · R · SwiftUI · Excel · PowerPoint · AI tools (Claude Code)</div>
+      <div><span>Languages</span>English · Spanish (professional) · Italian (elementary)</div>
+    </div>
   </div>
 </section>
 
